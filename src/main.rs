@@ -1,10 +1,15 @@
 use std::fs;
 use std::env;
+use std::time::Instant;
+
 mod day1;
 mod day2;
+mod day3;
 
 fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
+
+    let t0 = Instant::now();
 
     if day.unwrap_or(1) == 1 {
         let contents = fs::read_to_string("resources/day1.txt")?;
@@ -14,13 +19,18 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     if day.unwrap_or(2) == 2 {
         let contents = fs::read_to_string("resources/day2.txt")?;
-        //let contents = "1,0,0,0,99".to_string();
-        //let contents = "2,3,0,3,99".to_string();
-        //let contents = "2,4,4,5,99,0".to_string();
-        //let contents = "1,1,1,4,99,5,6,0,99".to_string();
         println!("Day2a: {:?}", day2::first(&contents));
         println!("Day2b: {}", day2::second(&contents));
     }
+
+    if day.unwrap_or(3) == 3 {
+        let contents = fs::read_to_string("resources/day3.txt")?;
+        println!("Day3a: {:?}", day3::first(&contents));
+        println!("Day3b: {}", day3::second(&contents));
+    }
+
+    let elapsed = t0.elapsed();
+    println!("Time taken: {:?}", elapsed);
 
     Ok(())
 }
