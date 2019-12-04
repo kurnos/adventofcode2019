@@ -35,19 +35,17 @@ fn run(mut memory: Vec<u32>) -> u32 {
 
 fn run_instruction(ic: usize, memory: &mut [u32]) -> Option<usize> {
     match memory[ic] as usize {
-        99 => {
-            None
-        },
+        99 => None,
         1 => {
             memory[memory[ic + 3] as usize] =
-            memory[memory[ic + 1] as usize] + memory[memory[ic + 2] as usize];
+                memory[memory[ic + 1] as usize] + memory[memory[ic + 2] as usize];
             Some(ic + 4)
-        },
+        }
         2 => {
             memory[memory[ic + 3] as usize] =
-            memory[memory[ic + 1] as usize] * memory[memory[ic + 2] as usize];
+                memory[memory[ic + 1] as usize] * memory[memory[ic + 2] as usize];
             Some(ic + 4)
-        },
-        opcode => panic!(format!("unknown command {}", memory[opcode]))
+        }
+        opcode => panic!(format!("unknown command {}", memory[opcode])),
     }
 }

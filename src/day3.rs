@@ -7,10 +7,7 @@ enum Seg {
 }
 
 pub fn first(contents: &String) -> i32 {
-    let wires = contents
-        .lines()
-        .map(|p| parse_wire(p))
-        .collect::<Vec<_>>();
+    let wires = contents.lines().map(|p| parse_wire(p)).collect::<Vec<_>>();
     let mut res = std::i32::MAX;
     for (_, s1) in &wires[0] {
         for (_, s2) in &wires[1] {
@@ -61,10 +58,7 @@ pub fn first(contents: &String) -> i32 {
 }
 
 pub fn second(contents: &String) -> i32 {
-    let wires = contents
-        .lines()
-        .map(|p| parse_wire(p))
-        .collect::<Vec<_>>();
+    let wires = contents.lines().map(|p| parse_wire(p)).collect::<Vec<_>>();
     let mut res = std::i32::MAX;
     for (d1, s1) in &wires[0] {
         for (d2, s2) in &wires[1] {
@@ -147,9 +141,7 @@ fn intersects(a: &Seg, b: &Seg) -> bool {
                 x0: b0b,
                 x1: b1b,
             },
-        ) if da == db && (between(b0a, b0b, b1b) || between(b0b, b0a, b1a)) => {
-            true
-        }
+        ) if da == db && (between(b0a, b0b, b1b) || between(b0b, b0a, b1a)) => true,
         _ => false,
     }
 }
