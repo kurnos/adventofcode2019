@@ -5,6 +5,7 @@ use std::time::Instant;
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
@@ -27,6 +28,11 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         let contents = fs::read_to_string("resources/day3.txt")?;
         println!("Day3a: {:?}", day3::first(&contents));
         println!("Day3b: {}", day3::second(&contents));
+    }
+
+    if day.unwrap_or(4) == 4 {
+        println!("Day4a: {:?}", day4::first(124075, 580769));
+        println!("Day4b: {}", day4::second(124075, 580769));
     }
 
     let elapsed = t0.elapsed();
