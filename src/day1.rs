@@ -1,7 +1,6 @@
 pub fn first(contents: &String) -> u32 {
     contents
-        .split('\n')
-        .filter(|s| s.len() > 0)
+        .lines()
         .map(|s| s.parse::<u32>().unwrap())
         .map(|m| (m / 3) - 2u32)
         .sum::<u32>()
@@ -9,8 +8,7 @@ pub fn first(contents: &String) -> u32 {
 
 pub fn second(contents: &String) -> i32 {
     contents
-        .split('\n')
-        .filter(|s| s.len() > 0)
+        .lines()
         .map(|s| s.parse::<u32>().unwrap())
         .map(|m| rocket_equation(m))
         .sum::<i32>()

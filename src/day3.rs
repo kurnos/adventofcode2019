@@ -8,7 +8,6 @@ enum Seg {
 
 pub fn first(contents: &String) -> i32 {
     let wires = contents
-        .trim()
         .lines()
         .map(|p| parse_wire(p))
         .collect::<Vec<_>>();
@@ -63,7 +62,6 @@ pub fn first(contents: &String) -> i32 {
 
 pub fn second(contents: &String) -> i32 {
     let wires = contents
-        .trim()
         .lines()
         .map(|p| parse_wire(p))
         .collect::<Vec<_>>();
