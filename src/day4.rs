@@ -1,5 +1,7 @@
-pub fn first(low: u32, high: u32) -> u32 {
-    (low..high).filter(|&x| is_valid1(x)).count() as u32
+use rayon::prelude::*;
+
+pub fn first_async(low: u32, high: u32) -> u32 {
+    (low..high).into_par_iter().filter(|&x| is_valid1(x)).count() as u32
 }
 
 fn decending_counts(mut n: u32) -> Option<[u8; 10]> {
@@ -28,8 +30,8 @@ fn is_valid1(n: u32) -> bool {
     false
 }
 
-pub fn second(low: u32, high: u32) -> u32 {
-    (low..high).filter(|&x| is_valid2(x)).count() as u32
+pub fn second_async(low: u32, high: u32) -> u32 {
+    (low..high).into_par_iter().filter(|&x| is_valid2(x)).count() as u32
 }
 
 fn is_valid2(n: u32) -> bool {
