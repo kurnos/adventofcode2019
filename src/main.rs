@@ -2,10 +2,12 @@ use std::env;
 use std::fs;
 use std::time::Instant;
 
+mod computer;
 mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 
 fn main() {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
@@ -30,6 +32,11 @@ fn main() {
     run_day(day, 4, || {
         let (low, high) = (124075, 580769);
         (day4::first_async(low, high), day4::second_async(low, high))
+    });
+
+    run_day(day, 5, || {
+        let contents = fs::read_to_string("resources/day5.txt").unwrap();
+        (day5::first(&contents), day5::second(&contents))
     });
 
     let elapsed = t0.elapsed();
