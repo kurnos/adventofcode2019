@@ -9,6 +9,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 fn main() {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
@@ -43,6 +44,11 @@ fn main() {
     run_day(day, 6, || {
         let contents = fs::read_to_string("resources/day6.txt").unwrap();
         (day6::first(&contents), day6::second(&contents))
+    });
+
+    run_day(day, 7, || {
+        let contents = fs::read_to_string("resources/day7.txt").unwrap();
+        (day7::first(&contents), day7::second(&contents))
     });
 
     let elapsed = t0.elapsed();
