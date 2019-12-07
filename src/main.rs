@@ -1,7 +1,6 @@
 use std::env;
 use std::fs;
 use std::time::Instant;
-
 mod computer;
 mod day1;
 mod day2;
@@ -55,7 +54,7 @@ fn main() {
         4,
         || {
             let (low, high) = (124075, 580769);
-            (day4::first_async(low, high), day4::second_async(low, high))
+            (day4::first(low, high), day4::second(low, high))
         },
         2150,
         1462,
