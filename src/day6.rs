@@ -1,22 +1,60 @@
-use petgraph::algo::{dijkstra};
-use petgraph::graphmap::UnGraphMap;
+use std::collections::HashMap;
+
+fn get_orbits(contents: &String) -> HashMap<&str, Vec<&str>> {
+    let mut orbits = HashMap::<&str, Vec<&str>>::new();
+    for (c, s) in contents.lines().map(|o| o.split_at(3)) {
+        orbits.entry(c).or_insert_with(|| vec![]).push(&s[1..]);
+    }
+    orbits
+}
 
 pub fn first(contents: &String) -> i32 {
-    let gr = UnGraphMap::<_, f32>::from_edges(
-        contents.lines()
-            .map(|s| s.trim())
-            .map(|s| s.split(')').collect::<Vec<_>>())
-            .map(|x| (x[0], x[1])),
-    );
-    dijkstra(&gr, "COM", None, |_| 1).values().sum::<i32>()
+    let orbits = get_orbits(contents);
+    let mut prev = vec!["COM"];
+    let (mut depth, mut res) = (0, 0);
+    while prev.len() > 0 {
+        res += depth * (prev.len() as i32);
+        let mut next = Vec::new();
+        for s in prev {
+            if let Some(sats) = orbits.get(s) {
+                next.extend(sats);
+            }
+        }
+        prev = next;
+        depth += 1;
+    }
+    res
+}
+
+fn find_path<'a>(
+    orbits: &HashMap<&'a str, Vec<&'a str>>,
+    from: &'a str,
+    to: &'a str,
+) -> Option<Vec<&'a str>> {
+    if from == to {
+        Some(vec![to])
+    } else {
+        let satellites = orbits.get(from)?;
+        let mut path = satellites
+            .iter()
+            .flat_map(|s| find_path(orbits, s, to))
+            .next()?;
+        path.push(from);
+        Some(path)
+    }
 }
 
 pub fn second(contents: &String) -> i32 {
-    let gr = UnGraphMap::<_, f32>::from_edges(
-        contents.lines()
-            .map(|s| s.trim())
-            .map(|s| s.split(')').collect::<Vec<_>>())
-            .map(|x| (x[0], x[1])),
-    );
-    dijkstra(&gr, "YOU", Some("SAN"), |_| 1)["SAN"] - 2
+    let orbits = get_orbits(contents);
+    let path_to_you = find_path(&orbits, "COM", "YOU").unwrap();
+    let path_to_santa = find_path(&orbits, "COM", "SAN").unwrap();
+
+    let common = path_to_you
+        .iter()
+        .rev()
+        .zip(path_to_santa.iter().rev())
+        .position(|(a, b)| a != b)
+        .unwrap();
+
+    (path_to_you.len() + path_to_santa.len() - 2 * common - 2) as i32
 }
