@@ -1,3 +1,6 @@
+// use std::collections::HashMap;
+// use std::hash::Hash;
+
 pub fn permutations<T: Clone>(mut xs: Vec<T>) -> Vec<Vec<T>> {
     permutations_inner(&mut xs, 0)
 }
@@ -15,3 +18,15 @@ fn permutations_inner<T: Clone>(xs: &mut Vec<T>, low: usize) -> Vec<Vec<T>> {
         return result;
     }
 }
+
+// pub fn counts<It, Item>(iter: It) -> HashMap<Item, u32>
+// where
+//     It: Iterator<Item = Item>,
+//     Item: Hash + Eq,
+// {
+//     let mut res = HashMap::new();
+//     for i in iter {
+//         *res.entry(i).or_default() += 1;
+//     }
+//     res
+// }
