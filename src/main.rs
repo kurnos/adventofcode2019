@@ -10,6 +10,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 mod utils;
 
 fn main() {
@@ -99,11 +100,21 @@ fn main() {
         8,
         || {
             let contents = fs::read_to_string("resources/day8.txt").unwrap();
-            //let contents = "123456789012".to_string();
             (day8::first(&contents), day8::second(&contents))
         },
         2806,
         "ZBJAB".to_string(),
+    );
+
+    run_day(
+        day,
+        9,
+        || {
+            let contents = fs::read_to_string("resources/day9.txt").unwrap();
+            (day9::first(&contents), day9::second(&contents))
+        },
+        2494485073,
+        44997,
     );
 
     let elapsed = t0.elapsed();
