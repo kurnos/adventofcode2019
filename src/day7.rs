@@ -1,7 +1,7 @@
-use crate::computer::{parse_memory, run, run_instruction};
+use crate::computer::{parse_memory, Computer};
 use crate::utils::permutations;
 use rayon::prelude::*;
-use std::collections::{VecDeque, HashMap};
+use std::collections::VecDeque;
 
 pub fn first(contents: &String) -> i128 {
     let mem = parse_memory(contents);
@@ -13,11 +13,11 @@ pub fn first(contents: &String) -> i128 {
 }
 
 fn trial(mem: &Vec<i128>, phases: Vec<i128>) -> i128 {
-    let a = run(mem.clone(), vec![phases[0], 0]).output[0];
-    let b = run(mem.clone(), vec![phases[1], a]).output[0];
-    let c = run(mem.clone(), vec![phases[2], b]).output[0];
-    let d = run(mem.clone(), vec![phases[3], c]).output[0];
-    let e = run(mem.clone(), vec![phases[4], d]).output[0];
+    let a = Computer::run(mem.clone(), vec![phases[0], 0]).output[0];
+    let b = Computer::run(mem.clone(), vec![phases[1], a]).output[0];
+    let c = Computer::run(mem.clone(), vec![phases[2], b]).output[0];
+    let d = Computer::run(mem.clone(), vec![phases[3], c]).output[0];
+    let e = Computer::run(mem.clone(), vec![phases[4], d]).output[0];
     e
 }
 
@@ -32,38 +32,28 @@ pub fn second(contents: &String) -> i128 {
 
 fn feedback_trial(mem: &Vec<i128>, phases: Vec<i128>) -> i128 {
     let mut thrusters = VecDeque::from(vec![
-        (0usize, mem.clone()),
-        (0usize, mem.clone()),
-        (0usize, mem.clone()),
-        (0usize, mem.clone()),
-        (0usize, mem.clone()),
+        Computer::from_memory(mem.clone()),
+        Computer::from_memory(mem.clone()),
+        Computer::from_memory(mem.clone()),
+        Computer::from_memory(mem.clone()),
+        Computer::from_memory(mem.clone()),
     ]);
 
     for i in 0..5 {
-        let (ic, mem) = &mut thrusters[i];
-        *ic = run_instruction(
-            *ic,
-            mem,
-            &mut HashMap::new(),
-            &mut VecDeque::from(vec![phases[i]]),
-            &mut VecDeque::new(),
-            &mut 0
-        )
-        .unwrap();
+        thrusters[i].input.push_back(phases[i]);
     }
 
-    let mut input = VecDeque::from(vec![0i128]);
-    let mut output = VecDeque::new();
+    thrusters[0].input.push_back(0);
     loop {
-        let (mut ic, mut mem) = thrusters.pop_front().unwrap();
-        while output.len() == 0 {
-            if let Some(next_ic) = run_instruction(ic, &mut mem, &mut HashMap::new(), &mut input, &mut output, &mut 0) {
-                ic = next_ic;
-            } else {
-                return input.pop_front().unwrap();
+        let mut state = thrusters.pop_front().unwrap();
+        while state.output.len() == 0 {
+            if !state.step() {
+                return state.input.pop_front().unwrap();
             }
         }
-        std::mem::swap(&mut input, &mut output);
-        thrusters.push_back((ic, mem));
+        thrusters[0]
+            .input
+            .push_back(state.output.pop_front().unwrap());
+        thrusters.push_back(state);
     }
 }

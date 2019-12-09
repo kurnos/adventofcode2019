@@ -1,7 +1,7 @@
-use crate::computer::{parse_memory, run};
+use crate::computer::{parse_memory, Computer};
 
 pub fn first(contents: &String) -> i128 {
-    run(parse_memory(contents), vec![1])
+    Computer::run(parse_memory(contents), vec![1])
         .output
         .into_iter()
         .last()
@@ -9,5 +9,5 @@ pub fn first(contents: &String) -> i128 {
 }
 
 pub fn second(contents: &String) -> i128 {
-    run(parse_memory(contents), vec![5]).output[0]
+    Computer::run(parse_memory(contents), vec![5]).output[0]
 }

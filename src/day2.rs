@@ -1,4 +1,4 @@
-use crate::computer::{parse_memory, run};
+use crate::computer::{parse_memory, Computer};
 
 pub fn first(content: &String) -> i128 {
     trial(&parse_memory(content), 12, 2)
@@ -25,5 +25,5 @@ fn trial(mem: &Vec<i128>, noun: i128, verb: i128) -> i128 {
     let mut memory = mem.clone();
     memory[1] = noun;
     memory[2] = verb;
-    run(memory, vec![]).memory[0]
+    Computer::run(memory, vec![]).memory[0]
 }
