@@ -1,55 +1,63 @@
 use std::collections::{HashMap, VecDeque};
+use std::convert::TryInto;
 
-pub struct ComputationResult {
-    pub memory: Vec<i128>,
-    pub output: Vec<i128>,
+pub struct ComputationResult<T> {
+    pub memory: Vec<T>,
+    pub output: Vec<T>,
 }
 
-pub struct Computer {
-    ic: usize,
-    memory: Vec<i128>,
-    vars: HashMap<usize, i128>,
-    pub input: VecDeque<i128>,
-    pub output: VecDeque<i128>,
-    relative_base: i128,
+pub struct Computer<T> {
+    pub ic: usize,
+    pub memory: Vec<T>,
+    pub vars: HashMap<usize, T>,
+    pub input: VecDeque<T>,
+    pub output: VecDeque<T>,
+    pub relative_base: T,
 }
 
-impl Computer {
-    pub fn from_memory(memory: Vec<i128>) -> Computer {
+impl<T> Computer<T>
+where
+    T: num::Integer,
+    T: TryInto<i16>,
+    <T as TryInto<i16>>::Error: std::fmt::Debug,
+    T: TryInto<usize>,
+    <T as TryInto<usize>>::Error: std::fmt::Debug,
+    T: std::ops::AddAssign,
+    T: std::marker::Copy,
+{
+    pub fn from_memory(memory: Vec<T>) -> Computer<T> {
         Computer {
             ic: 0,
             memory: memory,
             vars: HashMap::new(),
             input: VecDeque::new(),
             output: VecDeque::new(),
-            relative_base: 0,
+            relative_base: T::zero(),
         }
     }
 
-    pub fn run(memory: Vec<i128>, input: Vec<i128>) -> ComputationResult {
+    pub fn run(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
         let mut state = Computer::from_memory(memory);
-        state.input.extend(&input);
-    
+        state.input.extend(input);
         while state.step() == true {}
-    
         ComputationResult {
             memory: state.memory,
             output: Vec::from(state.output),
         }
     }
 
-    fn pop(&mut self, parameter_mode: i128) -> usize {
+    fn pop(&mut self, parameter_mode: i16) -> usize {
         let ic = self.ic;
         self.ic += 1;
         match parameter_mode % 10 {
-            0 => self.read(ic as usize) as usize,
+            0 => self.read(ic).try_into().unwrap(),
             1 => ic as usize,
-            2 => (self.read(ic as usize) + self.relative_base) as usize,
+            2 => (self.read(ic) + self.relative_base).try_into().unwrap(),
             _ => panic!(),
         }
     }
 
-    fn write(&mut self, pos: usize, val: i128) {
+    fn write(&mut self, pos: usize, val: T) {
         if pos < self.memory.len() {
             self.memory[pos] = val;
         } else {
@@ -57,16 +65,16 @@ impl Computer {
         }
     }
 
-    fn read(&self, pos: usize) -> i128 {
+    fn read(&self, pos: usize) -> T {
         if pos < self.memory.len() {
             self.memory[pos]
         } else {
-            self.vars.get(&pos).copied().unwrap_or_default()
+            self.vars.get(&pos).copied().unwrap_or_else(|| T::zero())
         }
     }
 
     pub fn step(&mut self) -> bool {
-        let op = self.memory[self.ic];
+        let op: i16 = self.memory[self.ic].try_into().unwrap();
         self.ic += 1;
         match op % 100 {
             99 => return false,
@@ -94,15 +102,15 @@ impl Computer {
             5 => {
                 let p1 = self.pop(op / 100);
                 let p2 = self.pop(op / 1000);
-                if self.read(p1) != 0 {
-                    self.ic = self.read(p2) as usize;
+                if !self.read(p1).is_zero() {
+                    self.ic = self.read(p2).try_into().unwrap();
                 }
             }
             6 => {
                 let p1 = self.pop(op / 100);
                 let p2 = self.pop(op / 1000);
-                if self.read(p1) == 0 {
-                    self.ic = self.read(p2) as usize;
+                if self.read(p1).is_zero() {
+                    self.ic = self.read(p2).try_into().unwrap();
                 }
             }
             7 => {
@@ -112,9 +120,9 @@ impl Computer {
                 self.write(
                     t,
                     if self.read(p1) < self.read(p2) {
-                        1
+                        T::one()
                     } else {
-                        0
+                        T::zero()
                     },
                 );
             }
@@ -125,9 +133,9 @@ impl Computer {
                 self.write(
                     t,
                     if self.read(p1) == self.read(p2) {
-                        1
+                        T::one()
                     } else {
-                        0
+                        T::zero()
                     },
                 );
             }

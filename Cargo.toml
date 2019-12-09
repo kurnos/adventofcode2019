@@ -12,3 +12,6 @@ version = "0.4.13"
 
 [dependencies.itertools]
 version = "0.8.2"
+
+[dependencies.num]
+version = "0.2.0"

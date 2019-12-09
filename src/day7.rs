@@ -3,7 +3,7 @@ use crate::utils::permutations;
 use rayon::prelude::*;
 use std::collections::VecDeque;
 
-pub fn first(contents: &String) -> i128 {
+pub fn first(contents: &String) -> i32 {
     let mem = parse_memory(contents);
     permutations(vec![0, 1, 2, 3, 4])
         .into_par_iter()
@@ -12,7 +12,7 @@ pub fn first(contents: &String) -> i128 {
         .unwrap()
 }
 
-fn trial(mem: &Vec<i128>, phases: Vec<i128>) -> i128 {
+fn trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     let a = Computer::run(mem.clone(), vec![phases[0], 0]).output[0];
     let b = Computer::run(mem.clone(), vec![phases[1], a]).output[0];
     let c = Computer::run(mem.clone(), vec![phases[2], b]).output[0];
@@ -21,7 +21,7 @@ fn trial(mem: &Vec<i128>, phases: Vec<i128>) -> i128 {
     e
 }
 
-pub fn second(contents: &String) -> i128 {
+pub fn second(contents: &String) -> i32 {
     let mem = parse_memory(contents);
     permutations(vec![5, 6, 7, 8, 9])
         .into_par_iter()
@@ -30,7 +30,7 @@ pub fn second(contents: &String) -> i128 {
         .unwrap()
 }
 
-fn feedback_trial(mem: &Vec<i128>, phases: Vec<i128>) -> i128 {
+fn feedback_trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     let mut thrusters = VecDeque::from(vec![
         Computer::from_memory(mem.clone()),
         Computer::from_memory(mem.clone()),

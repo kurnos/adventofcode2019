@@ -1,6 +1,6 @@
 use crate::computer::{parse_memory, Computer};
 
-pub fn first(contents: &String) -> i128 {
+pub fn first(contents: &String) -> i32 {
     Computer::run(parse_memory(contents), vec![1])
         .output
         .into_iter()
@@ -8,6 +8,6 @@ pub fn first(contents: &String) -> i128 {
         .unwrap()
 }
 
-pub fn second(contents: &String) -> i128 {
+pub fn second(contents: &String) -> i32 {
     Computer::run(parse_memory(contents), vec![5]).output[0]
 }
