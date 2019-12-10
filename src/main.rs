@@ -1,8 +1,11 @@
 use std::env;
 use std::fs;
 use std::time::Instant;
+#[macro_use]
+extern crate itertools;
 mod computer;
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -115,6 +118,17 @@ fn main() {
         },
         2494485073,
         44997,
+    );
+
+    run_day(
+        day,
+        10,
+        || {
+            let contents = fs::read_to_string("resources/day10.txt").unwrap();
+            (day10::first(&contents), day10::second(&contents))
+        },
+        278,
+        1417,
     );
 
     let elapsed = t0.elapsed();
