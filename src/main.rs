@@ -1,7 +1,6 @@
 use std::env;
 use std::fs;
 use std::time::Instant;
-#[macro_use]
 extern crate itertools;
 mod computer;
 mod day1;
