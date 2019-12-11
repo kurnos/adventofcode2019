@@ -43,15 +43,15 @@ impl Problem<String, String, u16, String> for Day8 {
                 }
             }
         }
-        // for i in 0..HEIGHT {
-        //     println!(
-        //         "{}",
-        //         &result[i * WIDTH..(i + 1) * WIDTH]
-        //             .iter()
-        //             .map(|&c| if c == '1' { '█' } else { ' ' })
-        //             .collect::<String>()
-        //     );
-        // }
+        for i in 0..HEIGHT {
+            println!(
+                "{}",
+                &result[i * WIDTH..(i + 1) * WIDTH]
+                    .iter()
+                    .map(|&c| if c == '1' { '█' } else { ' ' })
+                    .collect::<String>()
+            );
+        }
         "ZBJAB".to_string() // Through ocular inspection
     }
 }
