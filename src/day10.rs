@@ -1,6 +1,41 @@
+use crate::infra::Problem;
 use num::integer::gcd;
 use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
+
+pub struct Day10;
+
+const N: usize = 200;
+
+impl Problem<String, String, usize, i32> for Day10 {
+    fn day() -> u8 {
+        10
+    }
+    fn first(contents: String) -> usize {
+        let asteroids = parse_asteroids(&contents);
+
+        asteroids
+            .par_iter()
+            .map(|p| deltas(*p, &asteroids).len())
+            .max()
+            .unwrap()
+    }
+    fn second(contents: String) -> i32 {
+        let (from_x, from_y) = (19, 23);
+        let asteroids = parse_asteroids(&contents);
+        let targets = deltas_map((from_y as i8, from_x as i8), asteroids);
+        let mut shooting_order = targets.keys().collect::<Vec<_>>();
+        shooting_order.sort_by(|(ax, ay), (bx, by)| {
+            (*ax as f32)
+                .atan2(*ay as f32)
+                .partial_cmp(&(*bx as f32).atan2(*by as f32))
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .reverse()
+        });
+        let (_, x, y) = targets[shooting_order[N - 1]];
+        return 100 * (x as i32) + (y as i32);
+    }
+}
 
 fn parse_asteroids(contents: &str) -> Vec<(i8, i8)> {
     let mut res = Vec::new();
@@ -26,16 +61,6 @@ fn deltas((x0, y0): (i8, i8), field: &Vec<(i8, i8)>) -> HashSet<(i8, i8)> {
     seen
 }
 
-pub fn first(contents: &String) -> usize {
-    let asteroids = parse_asteroids(contents);
-
-    return asteroids
-        .par_iter()
-        .map(|p| deltas(*p, &asteroids).len())
-        .max()
-        .unwrap();
-}
-
 fn deltas_map((x0, y0): (i8, i8), asteroids: Vec<(i8, i8)>) -> HashMap<(i8, i8), (i8, i8, i8)> {
     let mut seen = HashMap::new();
     for (x, y) in asteroids {
@@ -53,24 +78,4 @@ fn deltas_map((x0, y0): (i8, i8), asteroids: Vec<(i8, i8)>) -> HashMap<(i8, i8),
             .or_insert((d, x, y));
     }
     seen
-}
-
-const N: usize = 200;
-
-pub fn second(contents: &String) -> i32 {
-    let (from_x, from_y) = (19, 23);
-    let asteroids = parse_asteroids(contents);
-
-    let targets = deltas_map((from_y as i8, from_x as i8), asteroids);
-
-    let mut shooting_order = targets.keys().collect::<Vec<_>>();
-    shooting_order.sort_by(|(ax, ay), (bx, by)| {
-        (*ax as f32)
-            .atan2(*ay as f32)
-            .partial_cmp(&(*bx as f32).atan2(*by as f32))
-            .unwrap_or(std::cmp::Ordering::Equal)
-            .reverse()
-    });
-    let (_, x, y) = targets[shooting_order[N - 1]];
-    return 100 * (x as i32) + (y as i32);
 }

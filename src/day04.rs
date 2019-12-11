@@ -1,3 +1,25 @@
+use crate::infra::Problem;
+
+pub struct Day4;
+
+impl Problem<(u32, u32), (u32, u32), u32, u32> for Day4 {
+    fn day() -> u8 {
+        4
+    }
+    fn first((low, high): (u32, u32)) -> u32 {
+        Ascending::larger_than(low)
+            .take_while(|&n| n < high)
+            .filter(|&x| is_valid1(x))
+            .count() as u32
+    }
+    fn second((low, high): (u32, u32)) -> u32 {
+        Ascending::larger_than(low)
+            .take_while(|&n| n < high)
+            .filter(|&x| is_valid2(x))
+            .count() as u32
+    }
+}
+
 struct Ascending {
     ns: [u8; 6],
 }
@@ -63,13 +85,6 @@ impl Iterator for Ascending {
     }
 }
 
-pub fn first(low: u32, high: u32) -> u32 {
-    Ascending::larger_than(low)
-        .take_while(|&n| n < high)
-        .filter(|&x| is_valid1(x))
-        .count() as u32
-}
-
 fn counts(mut n: u32) -> [u8; 10] {
     let mut counts: [u8; 10] = [0; 10];
     for _ in 0..6 {
@@ -87,13 +102,6 @@ fn is_valid1(n: u32) -> bool {
         }
     }
     false
-}
-
-pub fn second(low: u32, high: u32) -> u32 {
-    Ascending::larger_than(low)
-        .take_while(|&n| n < high)
-        .filter(|&x| is_valid2(x))
-        .count() as u32
 }
 
 fn is_valid2(n: u32) -> bool {

@@ -10,14 +10,14 @@ pub struct ComputationResult<T> {
 pub enum StepResult {
     Terminated,
     Running,
-    WaitingForInput,
+    WaitingForcontentsut,
 }
 
 pub struct Computer<T> {
     pub ic: usize,
     pub memory: Vec<T>,
     pub vars: HashMap<usize, T>,
-    pub input: VecDeque<T>,
+    pub contentsut: VecDeque<T>,
     pub output: VecDeque<T>,
     pub relative_base: T,
 }
@@ -37,15 +37,15 @@ where
             ic: 0,
             memory: memory,
             vars: HashMap::new(),
-            input: VecDeque::new(),
+            contentsut: VecDeque::new(),
             output: VecDeque::new(),
             relative_base: T::zero(),
         }
     }
 
-    pub fn run_from(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
+    pub fn run_from(memory: Vec<T>, contentsut: Vec<T>) -> ComputationResult<T> {
         let mut state = Computer::from_memory(memory);
-        state.input.extend(input);
+        state.contentsut.extend(contentsut);
         match state.run() {
             StepResult::Terminated => ComputationResult {
                 memory: state.memory,
@@ -109,11 +109,11 @@ where
                 self.write(t, self.read(p1) * self.read(p2));
             }
             3 => {
-                if let Some(i) = self.input.pop_front() {
+                if let Some(i) = self.contentsut.pop_front() {
                     let t = self.pop(op / 100);
                     self.write(t, i);
                 } else {
-                    return StepResult::WaitingForInput;
+                    return StepResult::WaitingForcontentsut;
                 }
             }
             4 => {

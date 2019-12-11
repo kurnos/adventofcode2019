@@ -1,15 +1,31 @@
 use crate::computer::{parse_memory, Computer, StepResult};
+use crate::infra::Problem;
 use crate::utils::permutations;
 use rayon::prelude::*;
 use std::collections::VecDeque;
 
-pub fn first(contents: &String) -> i32 {
-    let mem = parse_memory(contents);
-    permutations(vec![0, 1, 2, 3, 4])
-        .into_par_iter()
-        .map(|phases| trial(&mem, phases))
-        .max()
-        .unwrap()
+pub struct Day7;
+
+impl Problem<String, String, i32, i32> for Day7 {
+    fn day() -> u8 {
+        7
+    }
+    fn first(contents: String) -> i32 {
+        let mem = parse_memory(&contents);
+        permutations(vec![0, 1, 2, 3, 4])
+            .into_par_iter()
+            .map(|phases| trial(&mem, phases))
+            .max()
+            .unwrap()
+    }
+    fn second(contents: String) -> i32 {
+        let mem = parse_memory(&contents);
+        permutations(vec![5, 6, 7, 8, 9])
+            .into_par_iter()
+            .map(|phases| feedback_trial(&mem, phases))
+            .max()
+            .unwrap()
+    }
 }
 
 fn trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
@@ -19,15 +35,6 @@ fn trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     let d = Computer::run_from(mem.clone(), vec![phases[3], c]).output[0];
     let e = Computer::run_from(mem.clone(), vec![phases[4], d]).output[0];
     e
-}
-
-pub fn second(contents: &String) -> i32 {
-    let mem = parse_memory(contents);
-    permutations(vec![5, 6, 7, 8, 9])
-        .into_par_iter()
-        .map(|phases| feedback_trial(&mem, phases))
-        .max()
-        .unwrap()
 }
 
 fn feedback_trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
@@ -40,19 +47,19 @@ fn feedback_trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     ]);
 
     for i in 0..5 {
-        thrusters[i].input.push_back(phases[i]);
+        thrusters[i].contentsut.push_back(phases[i]);
     }
 
-    thrusters[0].input.push_back(0);
+    thrusters[0].contentsut.push_back(0);
     loop {
         let mut state = thrusters.pop_front().unwrap();
         while state.output.len() == 0 {
             if let StepResult::Terminated = state.step() {
-                return state.input.pop_front().unwrap();
+                return state.contentsut.pop_front().unwrap();
             }
         }
         thrusters[0]
-            .input
+            .contentsut
             .push_back(state.output.pop_front().unwrap());
         thrusters.push_back(state);
     }

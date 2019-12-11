@@ -1,9 +1,0 @@
-use crate::computer::{parse_memory, Computer};
-
-pub fn first(contents: &String) -> i64 {
-    Computer::run_from(parse_memory(contents), vec![1]).output[0]
-}
-
-pub fn second(contents: &String) -> i64 {
-    Computer::run_from(parse_memory(contents), vec![2]).output[0]
-}
