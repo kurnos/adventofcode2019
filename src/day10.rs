@@ -1,7 +1,9 @@
 use crate::infra::Problem;
 use num::integer::gcd;
 use rayon::prelude::*;
-use std::collections::{HashMap, HashSet};
+
+use bit_set::BitSet;
+use std::collections::HashMap;
 
 pub struct Day10;
 
@@ -14,9 +16,9 @@ impl Problem<String, String, usize, i32> for Day10 {
     fn first(contents: String) -> usize {
         let asteroids = parse_asteroids(&contents);
 
-        asteroids
-            .par_iter()
-            .map(|p| deltas(*p, &asteroids).len())
+        (0..asteroids.len())
+            .into_par_iter()
+            .map(|i| deltas(asteroids[i], &asteroids[..i], &asteroids[i + 1..]))
             .max()
             .unwrap()
     }
@@ -49,16 +51,14 @@ fn parse_asteroids(contents: &str) -> Vec<(i8, i8)> {
     res
 }
 
-fn deltas((x0, y0): (i8, i8), field: &Vec<(i8, i8)>) -> HashSet<(i8, i8)> {
-    let mut seen = HashSet::new();
-    for (x, y) in field {
-        if x0 == *x && y0 == *y {
-            continue;
-        }
+fn deltas((x0, y0): (i8, i8), before: &[(i8, i8)], after: &[(i8, i8)]) -> usize {
+    let mut seen = BitSet::new();
+    for (x, y) in before.iter().chain(after.iter()) {
         let d = gcd(x - x0, y - y0);
-        seen.insert(((x - x0) / d, (y - y0) / d));
+        let (dx, dy) = ((x - x0) / d, (y - y0) / d);
+        seen.insert((((35 + dx) as usize) << 6) + (dy + 35) as usize);
     }
-    seen
+    seen.len()
 }
 
 fn deltas_map((x0, y0): (i8, i8), asteroids: Vec<(i8, i8)>) -> HashMap<(i8, i8), (i8, i8, i8)> {

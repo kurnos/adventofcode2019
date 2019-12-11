@@ -18,3 +18,6 @@ version = "0.2.0"
 
 [dependencies.clipboard-win]
 version = "2.2.0"
+
+[dependencies.bit-set]
+version = "0.5.1"
