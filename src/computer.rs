@@ -43,9 +43,9 @@ where
         }
     }
 
-    pub fn run_from(memory: Vec<T>, contentsut: Vec<T>) -> ComputationResult<T> {
+    pub fn run_from(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
         let mut state = Computer::from_memory(memory);
-        state.input.extend(contentsut);
+        state.input.extend(input);
         match state.run() {
             StepResult::Terminated => ComputationResult {
                 memory: state.memory,
