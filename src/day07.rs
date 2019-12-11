@@ -47,19 +47,19 @@ fn feedback_trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     ]);
 
     for i in 0..5 {
-        thrusters[i].contentsut.push_back(phases[i]);
+        thrusters[i].input.push_back(phases[i]);
     }
 
-    thrusters[0].contentsut.push_back(0);
+    thrusters[0].input.push_back(0);
     loop {
         let mut state = thrusters.pop_front().unwrap();
         while state.output.len() == 0 {
             if let StepResult::Terminated = state.step() {
-                return state.contentsut.pop_front().unwrap();
+                return state.input.pop_front().unwrap();
             }
         }
         thrusters[0]
-            .contentsut
+            .input
             .push_back(state.output.pop_front().unwrap());
         thrusters.push_back(state);
     }

@@ -98,7 +98,12 @@ fn main() {
         (FromFile("day10.txt"), 1417),
     );
 
-    run_day(day, day11::Day11, (FromClipboard, ()), (FromClipboard, ()));
+    run_day(
+        day,
+        day11::Day11,
+        (FromFile("day11.txt"), 2594),
+        (FromFile("day11.txt"), "AKERJFHK".to_string()),
+    );
 
     let elapsed = t0.elapsed();
     println!("Time taken: {:?}", elapsed);
