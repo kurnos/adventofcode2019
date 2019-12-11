@@ -25,11 +25,16 @@ mod utils;
 
 fn main() {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
+    let times = env::args()
+        .nth(2)
+        .and_then(|d| d.parse::<u32>().ok())
+        .unwrap_or(1);
 
     let t0 = Instant::now();
 
     run_day(
         day,
+        times,
         day01::Day1,
         (FromFile("day1.txt"), 3325342),
         (FromFile("day1.txt"), 4985158),
@@ -37,6 +42,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day02::Day2,
         (FromFile("day2.txt"), 6568671),
         (FromFile("day2.txt"), 3951),
@@ -44,6 +50,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day03::Day3,
         (FromFile("day3.txt"), 316),
         (FromFile("day3.txt"), 16368),
@@ -51,6 +58,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day04::Day4,
         (Literal((124075, 580769)), 2150),
         (Literal((124075, 580769)), 1462),
@@ -58,6 +66,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day05::Day5,
         (FromFile("day5.txt"), 7692125),
         (FromFile("day5.txt"), 14340395),
@@ -65,6 +74,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day06::Day6,
         (FromFile("day6.txt"), 268504),
         (FromFile("day6.txt"), 409),
@@ -72,6 +82,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day07::Day7,
         (FromFile("day7.txt"), 118936),
         (FromFile("day7.txt"), 57660948),
@@ -79,6 +90,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day08::Day8,
         (FromFile("day8.txt"), 2806),
         (FromFile("day8.txt"), "ZBJAB".to_string()),
@@ -86,6 +98,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day09::Day9,
         (FromFile("day9.txt"), 2494485073),
         (FromFile("day9.txt"), 44997),
@@ -93,6 +106,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day10::Day10,
         (FromFile("day10.txt"), 278),
         (FromFile("day10.txt"), 1417),
@@ -100,6 +114,7 @@ fn main() {
 
     run_day(
         day,
+        times,
         day11::Day11,
         (FromFile("day11.txt"), 2594),
         (FromFile("day11.txt"), "AKERJFHK".to_string()),
