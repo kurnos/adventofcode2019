@@ -25,5 +25,5 @@ fn trial(mem: &Vec<i32>, noun: i32, verb: i32) -> i32 {
     let mut memory = mem.clone();
     memory[1] = noun;
     memory[2] = verb;
-    Computer::run(memory, vec![]).memory[0]
+    Computer::run_from(memory, vec![]).memory[0]
 }

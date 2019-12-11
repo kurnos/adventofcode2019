@@ -6,6 +6,13 @@ pub struct ComputationResult<T> {
     pub output: Vec<T>,
 }
 
+#[derive(Debug)]
+pub enum StepResult {
+    Terminated,
+    Running,
+    WaitingForInput,
+}
+
 pub struct Computer<T> {
     pub ic: usize,
     pub memory: Vec<T>,
@@ -36,13 +43,24 @@ where
         }
     }
 
-    pub fn run(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
+    pub fn run_from(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
         let mut state = Computer::from_memory(memory);
         state.input.extend(input);
-        while state.step() == true {}
-        ComputationResult {
-            memory: state.memory,
-            output: Vec::from(state.output),
+        match state.run() {
+            StepResult::Terminated => ComputationResult {
+                memory: state.memory,
+                output: Vec::from(state.output),
+            },
+            end_state => panic!("unexpected state {:?}", end_state),
+        }
+    }
+
+    pub fn run(&mut self) -> StepResult {
+        loop {
+            match self.step() {
+                StepResult::Running => continue,
+                stopped => return stopped,
+            }
         }
     }
 
@@ -73,11 +91,11 @@ where
         }
     }
 
-    pub fn step(&mut self) -> bool {
+    pub fn step(&mut self) -> StepResult {
         let op: i16 = self.memory[self.ic].try_into().unwrap();
         self.ic += 1;
         match op % 100 {
-            99 => return false,
+            99 => return StepResult::Terminated,
             1 => {
                 let p1 = self.pop(op / 100);
                 let p2 = self.pop(op / 1000);
@@ -91,9 +109,12 @@ where
                 self.write(t, self.read(p1) * self.read(p2));
             }
             3 => {
-                let t = self.pop(op / 100);
-                let i = self.input.pop_front().unwrap();
-                self.write(t, i);
+                if let Some(i) = self.input.pop_front() {
+                    let t = self.pop(op / 100);
+                    self.write(t, i);
+                } else {
+                    return StepResult::WaitingForInput;
+                }
             }
             4 => {
                 let p1 = self.pop(op / 100);
@@ -145,7 +166,7 @@ where
             }
             opcode => panic!(format!("unknown command {}", opcode)),
         };
-        true
+        StepResult::Running
     }
 }
 

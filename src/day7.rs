@@ -1,4 +1,4 @@
-use crate::computer::{parse_memory, Computer};
+use crate::computer::{parse_memory, Computer, StepResult};
 use crate::utils::permutations;
 use rayon::prelude::*;
 use std::collections::VecDeque;
@@ -13,11 +13,11 @@ pub fn first(contents: &String) -> i32 {
 }
 
 fn trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
-    let a = Computer::run(mem.clone(), vec![phases[0], 0]).output[0];
-    let b = Computer::run(mem.clone(), vec![phases[1], a]).output[0];
-    let c = Computer::run(mem.clone(), vec![phases[2], b]).output[0];
-    let d = Computer::run(mem.clone(), vec![phases[3], c]).output[0];
-    let e = Computer::run(mem.clone(), vec![phases[4], d]).output[0];
+    let a = Computer::run_from(mem.clone(), vec![phases[0], 0]).output[0];
+    let b = Computer::run_from(mem.clone(), vec![phases[1], a]).output[0];
+    let c = Computer::run_from(mem.clone(), vec![phases[2], b]).output[0];
+    let d = Computer::run_from(mem.clone(), vec![phases[3], c]).output[0];
+    let e = Computer::run_from(mem.clone(), vec![phases[4], d]).output[0];
     e
 }
 
@@ -47,7 +47,7 @@ fn feedback_trial(mem: &Vec<i32>, phases: Vec<i32>) -> i32 {
     loop {
         let mut state = thrusters.pop_front().unwrap();
         while state.output.len() == 0 {
-            if !state.step() {
+            if let StepResult::Terminated = state.step() {
                 return state.input.pop_front().unwrap();
             }
         }
