@@ -1,4 +1,5 @@
 extern crate clipboard_win;
+#[macro_use]
 extern crate itertools;
 extern crate num;
 extern crate petgraph;
@@ -20,6 +21,7 @@ mod day08;
 mod day09;
 mod day10;
 mod day11;
+mod day12;
 mod infra;
 mod utils;
 
@@ -118,6 +120,14 @@ fn main() {
         day11::Day11,
         (FromFile("day11.txt"), 2594),
         (FromFile("day11.txt"), "AKERJFHK".to_string()),
+    );
+
+    run_day(
+        day,
+        times,
+        day12::Day12,
+        (FromFile("day12.txt"), 12082),
+        (FromFile("day12.txt"), 295693702908636),
     );
 
     let elapsed = t0.elapsed();
