@@ -22,10 +22,10 @@ impl Problem<String, String, usize, String> for Day11 {
         let min_y = board.keys().map(|p| p.1).min().unwrap();
         let max_y = board.keys().map(|p| p.1).max().unwrap();
 
-        for y in min_y..max_y + 1 {
+        for y in min_y..=max_y {
             println!(
                 "{}",
-                (min_x..max_x + 1)
+                (min_x..=max_x)
                     .map(|x| match board.get(&(x, y)) {
                         Some(1) => '█',
                         _ => ' ',
@@ -33,7 +33,7 @@ impl Problem<String, String, usize, String> for Day11 {
                     .collect::<String>()
             );
         }
-        return "AKERJFHK".to_string(); // Through ocular inspection
+        "AKERJFHK".to_string() // Through ocular inspection
     }
 }
 

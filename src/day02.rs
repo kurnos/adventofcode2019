@@ -19,7 +19,7 @@ impl Problem<String, String, i32, i32> for Day2 {
             .unwrap();
         let max_noun = (0..100).find(|i| trial(&initial, *i, 0) >= target).unwrap();
         let verbs = (0..100).collect::<Vec<i32>>();
-        for noun in min_noun..(max_noun + 1) {
+        for noun in min_noun..=max_noun {
             if let Ok(verb) = verbs.binary_search_by_key(&target, |&v| trial(&initial, noun, v)) {
                 return noun * 100 + verb as i32;
             }
@@ -28,8 +28,8 @@ impl Problem<String, String, i32, i32> for Day2 {
     }
 }
 
-fn trial(mem: &Vec<i32>, noun: i32, verb: i32) -> i32 {
-    let mut memory = mem.clone();
+fn trial(mem: &[i32], noun: i32, verb: i32) -> i32 {
+    let mut memory = mem.to_owned();
     memory[1] = noun;
     memory[2] = verb;
     Computer::run_from(memory, vec![]).memory[0]

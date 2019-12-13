@@ -15,7 +15,7 @@ fn permutations_inner<T: Clone>(xs: &mut Vec<T>, low: usize) -> Vec<Vec<T>> {
             result.extend(permutations_inner(xs, low + 1));
             xs.swap(low, i);
         }
-        return result;
+        result
     }
 }
 

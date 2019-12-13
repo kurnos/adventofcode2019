@@ -26,35 +26,35 @@ struct Ascending {
 
 impl Ascending {
     fn larger_than(n: u32) -> Ascending {
-        let a = (n / 100000) as u8;
-        let mut b = (n / 10000 % 10) as u8;
-        let mut c = (n / 1000 % 10) as u8;
-        let mut d = (n / 100 % 10) as u8;
-        let mut e = (n / 10 % 10) as u8;
-        let mut f = (n % 10) as u8;
-        if b < a {
-            b = a;
-            c = b;
-            d = c;
-            e = d;
-            f = e;
-        } else if c < b {
-            c = b;
-            d = c;
-            e = d;
-            f = e;
-        } else if d < c {
-            d = c;
-            e = d;
-            f = e;
-        } else if e < d {
-            e = d;
-            f = e;
-        } else if f < e {
-            f = e;
+        let d0 = (n / 100000) as u8;
+        let mut d1 = (n / 10000 % 10) as u8;
+        let mut d2 = (n / 1000 % 10) as u8;
+        let mut d3 = (n / 100 % 10) as u8;
+        let mut d4 = (n / 10 % 10) as u8;
+        let mut d5 = (n % 10) as u8;
+        if d1 < d0 {
+            d1 = d0;
+            d2 = d1;
+            d3 = d2;
+            d4 = d3;
+            d5 = d4;
+        } else if d2 < d1 {
+            d2 = d1;
+            d3 = d2;
+            d4 = d3;
+            d5 = d4;
+        } else if d3 < d2 {
+            d3 = d2;
+            d4 = d3;
+            d5 = d4;
+        } else if d4 < d3 {
+            d4 = d3;
+            d5 = d4;
+        } else if d5 < d4 {
+            d5 = d4;
         }
         Ascending {
-            ns: [a, b, c, d, e, f],
+            ns: [d0, d1, d2, d3, d4, d5],
         }
     }
 }
@@ -90,7 +90,7 @@ fn counts(mut n: u32) -> [u8; 10] {
     for _ in 0..6 {
         let d = n % 10;
         counts[d as usize] += 1;
-        n = n / 10;
+        n /= 10;
     }
     counts
 }

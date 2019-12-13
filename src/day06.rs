@@ -11,7 +11,7 @@ impl Problem<String, String, i32, i32> for Day6 {
         let orbits = get_orbits(&contents);
         let mut prev = vec!["COM"];
         let (mut depth, mut res) = (0, 0);
-        while prev.len() > 0 {
+        while !prev.is_empty() {
             res += depth * (prev.len() as i32);
             let mut next = Vec::new();
             for s in prev {
@@ -38,7 +38,7 @@ impl Problem<String, String, i32, i32> for Day6 {
     }
 }
 
-fn get_orbits(contents: &String) -> HashMap<&str, Vec<&str>> {
+fn get_orbits(contents: &str) -> HashMap<&str, Vec<&str>> {
     let mut orbits = HashMap::<&str, Vec<&str>>::new();
     for (c, s) in contents.lines().map(|o| o.split_at(3)) {
         orbits.entry(c).or_insert_with(|| vec![]).push(&s[1..]);

@@ -35,7 +35,7 @@ where
     pub fn from_memory(memory: Vec<T>) -> Computer<T> {
         Computer {
             ic: 0,
-            memory: memory,
+            memory,
             vars: HashMap::new(),
             input: VecDeque::new(),
             output: VecDeque::new(),
@@ -87,7 +87,7 @@ where
         if pos < self.memory.len() {
             self.memory[pos]
         } else {
-            self.vars.get(&pos).copied().unwrap_or_else(|| T::zero())
+            self.vars.get(&pos).copied().unwrap_or_else(T::zero)
         }
     }
 
@@ -171,7 +171,7 @@ where
     }
 }
 
-pub fn parse_memory<T>(content: &String) -> Vec<T>
+pub fn parse_memory<T>(content: &str) -> Vec<T>
 where
     T: std::str::FromStr,
     <T as std::str::FromStr>::Err: std::fmt::Debug,

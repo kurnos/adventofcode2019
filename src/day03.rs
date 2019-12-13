@@ -20,10 +20,8 @@ impl Problem<String, String, i32, i32> for Day3 {
             for (_, s2) in &wires[1] {
                 if intersects(s1, s2) {
                     let n = match (s1, s2) {
-                        (Seg::V { x, y0: _, y1: _ }, Seg::H { y, x0: _, x1: _ })
-                        | (Seg::H { y, x0: _, x1: _ }, Seg::V { x, y0: _, y1: _ }) => {
-                            x.abs() + y.abs()
-                        }
+                        (Seg::V { x, .. }, Seg::H { y, .. })
+                        | (Seg::H { y, .. }, Seg::V { x, .. }) => x.abs() + y.abs(),
                         (
                             Seg::V {
                                 x,
@@ -31,9 +29,7 @@ impl Problem<String, String, i32, i32> for Day3 {
                                 y1: y1a,
                             },
                             Seg::V {
-                                x: _,
-                                y0: y0b,
-                                y1: y1b,
+                                y0: y0b, y1: y1b, ..
                             },
                         )
                         | (
@@ -43,9 +39,7 @@ impl Problem<String, String, i32, i32> for Day3 {
                                 x1: y1a,
                             },
                             Seg::H {
-                                y: _,
-                                x0: y0b,
-                                x1: y1b,
+                                x0: y0b, x1: y1b, ..
                             },
                         ) => {
                             let mut limits = vec![y0a, y1a, y0b, y1b];
@@ -72,34 +66,14 @@ impl Problem<String, String, i32, i32> for Day3 {
             for (d2, s2) in &wires[1] {
                 if intersects(s1, s2) {
                     let n = match (s1, s2) {
-                        (Seg::V { x, y0, y1: _ }, Seg::H { y, x0, x1: _ })
-                        | (Seg::H { y, x0, x1: _ }, Seg::V { x, y0, y1: _ }) => {
+                        (Seg::V { x, y0, .. }, Seg::H { y, x0, .. })
+                        | (Seg::H { y, x0, .. }, Seg::V { x, y0, .. }) => {
                             d1 + d2 + (x - x0).abs() + (y - y0).abs()
                         }
-                        (
-                            Seg::V {
-                                x: _,
-                                y0: a0,
-                                y1: _,
-                            },
-                            Seg::V {
-                                x: _,
-                                y0: b0,
-                                y1: _,
-                            },
-                        )
-                        | (
-                            Seg::H {
-                                y: _,
-                                x0: a0,
-                                x1: _,
-                            },
-                            Seg::H {
-                                y: _,
-                                x0: b0,
-                                x1: _,
-                            },
-                        ) => d1 + d2 + (a0 - b0).abs(),
+                        (Seg::V { y0: a0, .. }, Seg::V { y0: b0, .. })
+                        | (Seg::H { x0: a0, .. }, Seg::H { x0: b0, .. }) => {
+                            d1 + d2 + (a0 - b0).abs()
+                        }
                     };
                     if n > 0 && n < res {
                         res = n;
@@ -166,7 +140,7 @@ fn parse_wire(wire: &str) -> Vec<(i32, Seg)> {
                     "U" => {
                         *state = (start + d, x, y + d);
                         Seg::V {
-                            x: x,
+                            x,
                             y0: y,
                             y1: y + d,
                         }
@@ -174,7 +148,7 @@ fn parse_wire(wire: &str) -> Vec<(i32, Seg)> {
                     "D" => {
                         *state = (start + d, x, y - d);
                         Seg::V {
-                            x: x,
+                            x,
                             y0: y,
                             y1: y - d,
                         }
@@ -182,7 +156,7 @@ fn parse_wire(wire: &str) -> Vec<(i32, Seg)> {
                     "L" => {
                         *state = (start + d, x - d, y);
                         Seg::H {
-                            y: y,
+                            y,
                             x0: x,
                             x1: x - d,
                         }
@@ -190,7 +164,7 @@ fn parse_wire(wire: &str) -> Vec<(i32, Seg)> {
                     "R" => {
                         *state = (start + d, x + d, y);
                         Seg::H {
-                            y: y,
+                            y,
                             x0: x,
                             x1: x + d,
                         }

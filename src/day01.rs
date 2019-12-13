@@ -17,7 +17,7 @@ impl Problem<String, String, u32, i32> for Day1 {
         contents
             .lines()
             .map(|s| s.parse::<u32>().unwrap())
-            .map(|m| rocket_equation(m))
+            .map(rocket_equation)
             .sum::<i32>()
     }
 }

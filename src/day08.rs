@@ -3,7 +3,7 @@ use itertools::Itertools;
 
 pub struct Day8;
 
-fn my_counts<'a, It: Iterator<Item = char>>(iter: It) -> [u16; 3] {
+fn my_counts<It: Iterator<Item = char>>(iter: It) -> [u16; 3] {
     let mut res = [0; 3];
     for i in iter {
         res[((i as u8) - 48) as usize] += 1;
@@ -24,7 +24,7 @@ impl Problem<String, String, u16, String> for Day8 {
             .filter(|&c| c != '\n')
             .chunks(WIDTH * HEIGHT)
             .into_iter()
-            .map(|layer| my_counts(layer))
+            .map(my_counts)
             .min_by_key(|cs| cs[0])
             .unwrap();
         x[1] * x[2]

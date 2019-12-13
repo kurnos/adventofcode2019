@@ -35,7 +35,7 @@ impl Problem<String, String, usize, i32> for Day10 {
                 .reverse()
         });
         let (_, x, y) = targets[shooting_order[N - 1]];
-        return 100 * (x as i32) + (y as i32);
+        100 * (x as i32) + (y as i32)
     }
 }
 
