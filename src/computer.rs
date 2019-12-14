@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 use std::convert::TryInto;
 
 pub struct ComputationResult<T> {
@@ -16,7 +16,6 @@ pub enum StepResult {
 pub struct Computer<T> {
     pub ic: usize,
     pub memory: Vec<T>,
-    pub vars: HashMap<usize, T>,
     pub input: VecDeque<T>,
     pub output: VecDeque<T>,
     pub relative_base: T,
@@ -36,7 +35,6 @@ where
         Computer {
             ic: 0,
             memory,
-            vars: HashMap::new(),
             input: VecDeque::new(),
             output: VecDeque::new(),
             relative_base: T::zero(),
@@ -76,18 +74,17 @@ where
     }
 
     fn write(&mut self, pos: usize, val: T) {
-        if pos < self.memory.len() {
-            self.memory[pos] = val;
-        } else {
-            self.vars.insert(pos, val);
+        while pos >= self.memory.len() {
+            self.memory.push(T::zero());
         }
+        self.memory[pos] = val;
     }
 
     fn read(&self, pos: usize) -> T {
         if pos < self.memory.len() {
             self.memory[pos]
         } else {
-            self.vars.get(&pos).copied().unwrap_or_else(T::zero)
+            T::zero()
         }
     }
 
