@@ -1,5 +1,6 @@
-use crate::computer::{parse_memory, Computer, StepResult};
+use crate::computer::{Computer, ComputerState};
 use crate::infra::Problem;
+use itertools::Itertools;
 use std::collections::HashMap;
 
 pub struct Day11;
@@ -9,13 +10,11 @@ impl Problem<String, String, usize, String> for Day11 {
         11
     }
     fn first(contents: String) -> usize {
-        paint(Computer::from_memory(parse_memory(&contents)), 0).len()
+        paint(Computer::from_str(&contents), 0).len()
     }
 
     fn second(contents: String) -> String {
-        let vm = Computer::from_memory(parse_memory(&contents));
-
-        let board = paint(vm, 1);
+        let board = paint(Computer::from_str(&contents), 1);
 
         let min_x = board.keys().map(|p| p.0).min().unwrap();
         let max_x = board.keys().map(|p| p.0).max().unwrap();
@@ -42,13 +41,13 @@ fn paint(mut vm: Computer<i64>, start: i64) -> HashMap<(i64, i64), i64> {
 
     let (mut x, mut y, mut dir) = (0i64, 0i64, 0i64);
 
-    vm.input.push_front(start);
     board.insert((0, 0), start);
-    while let StepResult::WaitingForInput = vm.run() {
-        let c = vm.output.pop_front().unwrap();
-        let turn = vm.output.pop_front().unwrap();
-        board.insert((x, y), c);
+    vm.run();
+    while let ComputerState::WaitingForInput = vm.state {
+        vm.run_with_input(*board.get(&(x, y)).unwrap_or(&0));
+        let (c, turn) = vm.iter().next_tuple().unwrap();
 
+        board.insert((x, y), c);
         dir = (dir + 5 - 2 * turn) % 4;
         match dir {
             0 => y -= 1,
@@ -57,8 +56,6 @@ fn paint(mut vm: Computer<i64>, start: i64) -> HashMap<(i64, i64), i64> {
             3 => x += 1,
             _ => {}
         };
-
-        vm.input.push_front(*board.get(&(x, y)).unwrap_or(&0));
     }
     board
 }

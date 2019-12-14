@@ -1,23 +1,19 @@
-use std::collections::VecDeque;
 use std::convert::TryInto;
+use std::fmt::Debug;
 
-pub struct ComputationResult<T> {
-    pub memory: Vec<T>,
-    pub output: Vec<T>,
-}
-
-#[derive(Debug)]
-pub enum StepResult {
+#[derive(Debug, Clone, Copy)]
+pub enum ComputerState<T> {
+    NotYetStarted,
     Terminated,
-    Running,
     WaitingForInput,
+    HasOutput(T),
 }
 
 pub struct Computer<T> {
     pub ic: usize,
+    pub state: ComputerState<T>,
+    pub input_pos: Option<usize>,
     pub memory: Vec<T>,
-    pub input: VecDeque<T>,
-    pub output: VecDeque<T>,
     pub relative_base: T,
 }
 
@@ -25,41 +21,154 @@ impl<T> Computer<T>
 where
     T: num::Integer,
     T: TryInto<i16>,
-    <T as TryInto<i16>>::Error: std::fmt::Debug,
+    <T as TryInto<i16>>::Error: Debug,
     T: TryInto<usize>,
-    <T as TryInto<usize>>::Error: std::fmt::Debug,
+    <T as TryInto<usize>>::Error: Debug,
     T: std::ops::AddAssign,
     T: std::marker::Copy,
 {
+    pub fn from_str(content: &str) -> Computer<T>
+    where
+        T: std::str::FromStr,
+        <T as std::str::FromStr>::Err: Debug,
+    {
+        Computer::from_memory(parse_memory(content))
+    }
+
     pub fn from_memory(memory: Vec<T>) -> Computer<T> {
         Computer {
             ic: 0,
+            state: ComputerState::NotYetStarted,
             memory,
-            input: VecDeque::new(),
-            output: VecDeque::new(),
+            input_pos: None,
             relative_base: T::zero(),
         }
     }
-
-    pub fn run_from(memory: Vec<T>, input: Vec<T>) -> ComputationResult<T> {
-        let mut state = Computer::from_memory(memory);
-        state.input.extend(input);
-        match state.run() {
-            StepResult::Terminated => ComputationResult {
-                memory: state.memory,
-                output: Vec::from(state.output),
-            },
-            end_state => panic!("unexpected state {:?}", end_state),
+    pub fn is_terminated(&self) -> bool {
+        match self.state {
+            ComputerState::Terminated => true,
+            _ => false,
         }
     }
 
-    pub fn run(&mut self) -> StepResult {
+    pub fn run_through(&mut self, mut input: Vec<T>) -> Vec<T> {
+        let mut res = Vec::new();
         loop {
-            match self.step() {
-                StepResult::Running => continue,
-                stopped => return stopped,
-            }
+            match self.state {
+                ComputerState::NotYetStarted => {
+                    self.run();
+                }
+                ComputerState::HasOutput(x) => {
+                    res.push(x);
+                    self.run();
+                }
+                ComputerState::WaitingForInput => {
+                    self.run_with_input(input.pop().unwrap());
+                }
+                ComputerState::Terminated => break,
+            };
         }
+        res
+    }
+
+    pub fn run(&mut self) -> ComputerState<T> {
+        match self.state {
+            ComputerState::NotYetStarted | ComputerState::HasOutput(_) => self.exec(),
+            _ => panic!("Invalid state"),
+        }
+    }
+
+    pub fn run_with_input(&mut self, input: T) -> ComputerState<T> {
+        match self.state {
+            ComputerState::WaitingForInput => {
+                self.write(self.input_pos.unwrap(), input);
+                self.exec()
+            }
+            _ => panic!("Invalid state"),
+        }
+    }
+
+    fn exec(&mut self) -> ComputerState<T> {
+        loop {
+            let op: i16 = self.memory[self.ic].try_into().unwrap();
+            self.ic += 1;
+
+            match op % 100 {
+                99 => {
+                    self.state = ComputerState::Terminated;
+                    break;
+                }
+                1 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    let t = self.pop(op / 10000);
+                    self.write(t, self.read(p1) + self.read(p2));
+                }
+                2 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    let t = self.pop(op / 10000);
+                    self.write(t, self.read(p1) * self.read(p2));
+                }
+                3 => {
+                    let t = self.pop(op / 100);
+                    self.input_pos = t.try_into().unwrap();
+                    self.state = ComputerState::WaitingForInput;
+                    break;
+                }
+                4 => {
+                    let p1 = self.pop(op / 100);
+                    self.state = ComputerState::HasOutput(self.read(p1));
+                    break;
+                }
+                5 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    if !self.read(p1).is_zero() {
+                        self.ic = self.read(p2).try_into().unwrap();
+                    }
+                }
+                6 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    if self.read(p1).is_zero() {
+                        self.ic = self.read(p2).try_into().unwrap();
+                    }
+                }
+                7 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    let t = self.pop(op / 10000);
+                    self.write(
+                        t,
+                        if self.read(p1) < self.read(p2) {
+                            T::one()
+                        } else {
+                            T::zero()
+                        },
+                    );
+                }
+                8 => {
+                    let p1 = self.pop(op / 100);
+                    let p2 = self.pop(op / 1000);
+                    let t = self.pop(op / 10000);
+                    self.write(
+                        t,
+                        if self.read(p1) == self.read(p2) {
+                            T::one()
+                        } else {
+                            T::zero()
+                        },
+                    );
+                }
+                9 => {
+                    let p1 = self.pop(op / 100);
+                    self.relative_base += self.read(p1);
+                }
+                opcode => panic!(format!("unknown command {}", opcode)),
+            };
+        }
+        self.state
     }
 
     fn pop(&mut self, parameter_mode: i16) -> usize {
@@ -67,7 +176,7 @@ where
         self.ic += 1;
         match parameter_mode % 10 {
             0 => self.read(ic).try_into().unwrap(),
-            1 => ic as usize,
+            1 => ic,
             2 => (self.read(ic) + self.relative_base).try_into().unwrap(),
             _ => panic!(),
         }
@@ -88,90 +197,47 @@ where
         }
     }
 
-    pub fn step(&mut self) -> StepResult {
-        let op: i16 = self.memory[self.ic].try_into().unwrap();
-        self.ic += 1;
-        match op % 100 {
-            99 => return StepResult::Terminated,
-            1 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                let t = self.pop(op / 10000);
-                self.write(t, self.read(p1) + self.read(p2));
+    pub fn iter(&mut self) -> ComputerIterator<'_, T> {
+        ComputerIterator { computer: self }
+    }
+}
+
+pub struct ComputerIterator<'a, T: std::marker::Copy> {
+    computer: &'a mut Computer<T>,
+}
+
+impl<'a, T> Iterator for ComputerIterator<'_, T>
+where
+    T: num::Integer,
+    T: TryInto<i16>,
+    <T as TryInto<i16>>::Error: Debug,
+    T: TryInto<usize>,
+    <T as TryInto<usize>>::Error: Debug,
+    T: std::ops::AddAssign,
+    T: std::marker::Copy,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.computer.state {
+            ComputerState::NotYetStarted => {
+                self.computer.exec();
+                self.next()
             }
-            2 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                let t = self.pop(op / 10000);
-                self.write(t, self.read(p1) * self.read(p2));
+            ComputerState::HasOutput(x) => {
+                self.computer.exec();
+                Some(x)
             }
-            3 => {
-                if let Some(i) = self.input.pop_front() {
-                    let t = self.pop(op / 100);
-                    self.write(t, i);
-                } else {
-                    self.ic -= 1;
-                    return StepResult::WaitingForInput;
-                }
-            }
-            4 => {
-                let p1 = self.pop(op / 100);
-                self.output.push_back(self.read(p1));
-            }
-            5 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                if !self.read(p1).is_zero() {
-                    self.ic = self.read(p2).try_into().unwrap();
-                }
-            }
-            6 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                if self.read(p1).is_zero() {
-                    self.ic = self.read(p2).try_into().unwrap();
-                }
-            }
-            7 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                let t = self.pop(op / 10000);
-                self.write(
-                    t,
-                    if self.read(p1) < self.read(p2) {
-                        T::one()
-                    } else {
-                        T::zero()
-                    },
-                );
-            }
-            8 => {
-                let p1 = self.pop(op / 100);
-                let p2 = self.pop(op / 1000);
-                let t = self.pop(op / 10000);
-                self.write(
-                    t,
-                    if self.read(p1) == self.read(p2) {
-                        T::one()
-                    } else {
-                        T::zero()
-                    },
-                );
-            }
-            9 => {
-                let p1 = self.pop(op / 100);
-                self.relative_base += self.read(p1);
-            }
-            opcode => panic!(format!("unknown command {}", opcode)),
-        };
-        StepResult::Running
+            ComputerState::Terminated => None,
+            ComputerState::WaitingForInput => None,
+        }
     }
 }
 
 pub fn parse_memory<T>(content: &str) -> Vec<T>
 where
     T: std::str::FromStr,
-    <T as std::str::FromStr>::Err: std::fmt::Debug,
+    <T as std::str::FromStr>::Err: Debug,
 {
     content
         .trim()

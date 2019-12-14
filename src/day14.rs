@@ -16,6 +16,7 @@ impl Problem<String, String, u64, u64> for Day14 {
     }
     fn second(contents: String) -> u64 {
         let (order, costs) = parse_reactions(&contents);
+
         crate::utils::bisect(
             |n| required_ore(&costs, &order, n),
             1,

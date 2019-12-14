@@ -5,7 +5,7 @@ extern crate num;
 extern crate petgraph;
 extern crate rayon;
 
-use crate::infra::{run_day, FromClipboard, FromFile, Literal};
+use crate::infra::{run_day, FromFile, Literal};
 use std::env;
 use std::time::Instant;
 

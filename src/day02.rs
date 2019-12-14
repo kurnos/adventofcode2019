@@ -29,8 +29,9 @@ impl Problem<String, String, i32, i32> for Day2 {
 }
 
 fn trial(mem: &[i32], noun: i32, verb: i32) -> i32 {
-    let mut memory = mem.to_owned();
-    memory[1] = noun;
-    memory[2] = verb;
-    Computer::run_from(memory, vec![]).memory[0]
+    let mut cpu = Computer::from_memory(mem.to_owned());
+    cpu.memory[1] = noun;
+    cpu.memory[2] = verb;
+    cpu.run();
+    cpu.memory[0]
 }
