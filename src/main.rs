@@ -27,6 +27,7 @@ mod day14;
 mod infra;
 mod utils;
 
+#[allow(clippy::unreadable_literal)]
 fn main() {
     let day = env::args().nth(1).and_then(|d| d.parse::<u8>().ok());
     let times = env::args()

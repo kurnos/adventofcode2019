@@ -26,7 +26,7 @@ struct Ascending {
 
 impl Ascending {
     fn larger_than(n: u32) -> Ascending {
-        let d0 = (n / 100000) as u8;
+        let d0 = (n / 100_000) as u8;
         let mut d1 = (n / 10000 % 10) as u8;
         let mut d2 = (n / 1000 % 10) as u8;
         let mut d3 = (n / 100 % 10) as u8;
@@ -65,7 +65,7 @@ impl Iterator for Ascending {
         if self.ns[0] > 9 {
             return None;
         }
-        let val = 100000 * self.ns[0] as u32
+        let val = 100_000 * self.ns[0] as u32
             + 10000 * self.ns[1] as u32
             + 1000 * self.ns[2] as u32
             + 100 * self.ns[3] as u32

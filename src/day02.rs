@@ -11,7 +11,7 @@ impl Problem<String, String, i32, i32> for Day2 {
         trial(&parse_memory(&contents), 12, 2)
     }
     fn second(contents: String) -> i32 {
-        let target = 19690720;
+        let target = 19_690_720;
         let initial = parse_memory(&contents);
         let min_noun = (0..100)
             .rev()
