@@ -59,7 +59,7 @@ fn feedback_trial(mem: &[i32], phases: Vec<i32>) -> i32 {
             return token;
         }
         thrusters[i].run_with_input(token);
-        token = thrusters[i].iter().next().unwrap()
+        token = (&mut thrusters[i]).next().unwrap()
     }
     0
 }

@@ -45,7 +45,7 @@ fn paint(mut vm: Computer<i64>, start: i64) -> HashMap<(i64, i64), i64> {
     vm.run();
     while let ComputerState::WaitingForInput = vm.state {
         vm.run_with_input(*board.get(&(x, y)).unwrap_or(&0));
-        let (c, turn) = vm.iter().next_tuple().unwrap();
+        let (c, turn) = (&mut vm).next_tuple().unwrap();
 
         board.insert((x, y), c);
         dir = (dir + 5 - 2 * turn) % 4;

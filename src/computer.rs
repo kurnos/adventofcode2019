@@ -196,17 +196,9 @@ where
             T::zero()
         }
     }
-
-    pub fn iter(&mut self) -> ComputerIterator<'_, T> {
-        ComputerIterator { computer: self }
-    }
 }
 
-pub struct ComputerIterator<'a, T: std::marker::Copy> {
-    computer: &'a mut Computer<T>,
-}
-
-impl<'a, T> Iterator for ComputerIterator<'_, T>
+impl<'a, T> Iterator for &mut Computer<T>
 where
     T: num::Integer,
     T: TryInto<i16>,
@@ -219,13 +211,13 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.computer.state {
+        match self.state {
             ComputerState::NotYetStarted => {
-                self.computer.exec();
+                self.exec();
                 self.next()
             }
             ComputerState::HasOutput(x) => {
-                self.computer.exec();
+                self.exec();
                 Some(x)
             }
             ComputerState::Terminated => None,

@@ -11,7 +11,6 @@ impl Problem<String, String, usize, i32> for Day13 {
     }
     fn first(contents: String) -> usize {
         Computer::<i32>::from_str(&contents)
-            .iter()
             .tuples()
             .filter(|(_, _, t)| *t == 2)
             .count()
@@ -22,7 +21,7 @@ impl Problem<String, String, usize, i32> for Day13 {
         let (mut score, mut paddle_x, mut ball_x) = (0, 0, 0);
 
         loop {
-            for (x, _, t) in c.iter().tuples() {
+            for (x, _, t) in c.tuples() {
                 match (x, t) {
                     (-1, s) => score = s,
                     (x, 3) => paddle_x = x,

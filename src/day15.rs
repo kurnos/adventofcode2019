@@ -1,4 +1,4 @@
-use crate::computer::{Computer, ComputerState};
+use crate::computer::Computer;
 use crate::infra::Problem;
 use petgraph::algo::dijkstra;
 use petgraph::graphmap::UnGraphMap;
@@ -35,27 +35,29 @@ fn map_ship(contents: &str) -> ((i64, i64), UnGraphMap<(i64, i64), ()>) {
     let mut d = Dir::North;
     let mut target = (0, 0);
     let mut graph = UnGraphMap::new();
+
+    cpu.run();
     loop {
-        cpu.run();
-        match cpu.run_with_input(match d {
+        cpu.run_with_input(match d {
             Dir::North => 1,
             Dir::South => 2,
             Dir::West => 3,
             Dir::East => 4,
-        }) {
-            ComputerState::HasOutput(0) => {
+        });
+        match (&mut cpu).next() {
+            Some(0) => {
                 d = ccw(d);
             }
-            ComputerState::HasOutput(1) => {
+            Some(1) => {
                 graph.add_edge(p, next(p, d), ());
                 p = next(p, d);
                 d = cw(d);
             }
-            ComputerState::HasOutput(2) => {
+            Some(2) => {
                 graph.add_edge(p, next(p, d), ());
                 p = next(p, d);
                 target = p;
-                d = ccw(d);
+                d = cw(d);
             }
             _ => panic!(),
         };

@@ -11,12 +11,12 @@ impl Problem<String, String, i32, i32> for Day5 {
         let mut c = Computer::from_str(&contents);
         c.run();
         c.run_with_input(1);
-        c.iter().last().unwrap()
+        c.last().unwrap()
     }
     fn second(contents: String) -> i32 {
         let mut c = Computer::from_str(&contents);
         c.run();
         c.run_with_input(5);
-        c.iter().next().unwrap()
+        (&mut c).next().unwrap()
     }
 }
