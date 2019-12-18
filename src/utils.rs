@@ -1,7 +1,7 @@
 // use std::collections::HashMap;
 // use std::hash::Hash;
 
-#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(Hash, PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Point2d<T> {
     pub x: T,
     pub y: T,
