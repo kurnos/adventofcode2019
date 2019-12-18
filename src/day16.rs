@@ -12,9 +12,7 @@ impl Problem<String, String, i32, i32> for Day16 {
         for _ in 0..100 {
             nums = phase(&nums);
         }
-        nums[..8]
-            .into_iter()
-            .fold(0 as i32, |a, &x| 10 * a + x as i32)
+        nums[..8].iter().fold(0 as i32, |a, &x| 10 * a + x as i32)
     }
     fn second(contents: String) -> i32 {
         let offset: usize = contents[..7].parse().unwrap();
@@ -27,16 +25,20 @@ impl Problem<String, String, i32, i32> for Day16 {
             .copied()
             .collect::<Vec<_>>();
 
-        for _ in 0..100 {
-            let mut cumsum = 0i32;
+        for _ in 0..25 {
+            let mut cumsum = 0i8;
+            let mut cumsum2 = 0i8;
+            let mut cumsum3 = 0i8;
+            let mut cumsum4 = 0i8;
             for i in (0..nums.len()).rev() {
-                cumsum += nums[i] as i32;
-                nums[i] = (cumsum % 10).abs() as i8;
+                cumsum = (cumsum + nums[i]) % 10;
+                cumsum2 = (cumsum2 + cumsum) % 10;
+                cumsum3 = (cumsum3 + cumsum2) % 10;
+                cumsum4 = (cumsum4 + cumsum3) % 10;
+                nums[i] = cumsum4;
             }
         }
-        nums[..8]
-            .into_iter()
-            .fold(0 as i32, |a, &x| 10 * a + x as i32)
+        nums[..8].iter().fold(0 as i32, |a, &x| 10 * a + x as i32)
     }
 }
 
