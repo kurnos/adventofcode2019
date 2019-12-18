@@ -52,6 +52,7 @@ where
     }
 
     pub fn run_through(&mut self, mut input: Vec<T>) -> Vec<T> {
+        input.reverse();
         let mut res = Vec::new();
         loop {
             match self.state {

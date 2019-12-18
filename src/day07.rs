@@ -31,7 +31,7 @@ fn trial(mem: &[i32], phases: Vec<i32>) -> i32 {
     let mut token = 0;
     for phase in phases {
         token = Computer::from_memory(mem.to_owned())
-            .run_through(vec![token, phase])
+            .run_through(vec![phase, token])
             .into_iter()
             .last()
             .unwrap();

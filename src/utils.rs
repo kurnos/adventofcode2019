@@ -1,6 +1,76 @@
 // use std::collections::HashMap;
 // use std::hash::Hash;
 
+#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
+pub struct Point2d<T> {
+    pub x: T,
+    pub y: T,
+}
+
+impl<T> Point2d<T> {
+    pub fn new(x: T, y: T) -> Point2d<T> {
+        Point2d { x, y }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Dir {
+    North,
+    West,
+    East,
+    South,
+}
+
+impl Dir {
+    pub fn cw(self) -> Dir {
+        match self {
+            Dir::North => Dir::East,
+            Dir::East => Dir::South,
+            Dir::South => Dir::West,
+            Dir::West => Dir::North,
+        }
+    }
+
+    pub fn ccw(self) -> Dir {
+        match self {
+            Dir::East => Dir::North,
+            Dir::South => Dir::East,
+            Dir::West => Dir::South,
+            Dir::North => Dir::West,
+        }
+    }
+}
+
+impl<T> std::ops::Add<Dir> for Point2d<T>
+where
+    T: std::ops::Sub<Output = T>,
+    T: std::ops::Add<Output = T>,
+    T: num::One,
+{
+    type Output = Point2d<T>;
+    #[allow(clippy::suspicious_arithmetic_impl)]
+    fn add(self, rhs: Dir) -> Self::Output {
+        match rhs {
+            Dir::North => Point2d {
+                x: self.x,
+                y: self.y - T::one(),
+            },
+            Dir::South => Point2d {
+                x: self.x,
+                y: self.y + T::one(),
+            },
+            Dir::West => Point2d {
+                x: self.x - T::one(),
+                y: self.y,
+            },
+            Dir::East => Point2d {
+                x: self.x + T::one(),
+                y: self.y,
+            },
+        }
+    }
+}
+
 pub fn permutations<T: Clone>(mut xs: Vec<T>) -> Vec<Vec<T>> {
     permutations_inner(&mut xs, 0)
 }
