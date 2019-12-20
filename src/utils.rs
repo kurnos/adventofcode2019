@@ -13,7 +13,7 @@ impl<T> Point2d<T> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Dir {
     North,
     West,
