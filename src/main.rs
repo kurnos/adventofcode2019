@@ -1,4 +1,3 @@
-extern crate clipboard_win;
 #[macro_use]
 extern crate itertools;
 extern crate num;
@@ -10,6 +9,7 @@ use std::env;
 use std::time::Instant;
 
 mod computer;
+mod day22;
 mod day01;
 mod day02;
 mod day03;
@@ -210,6 +210,14 @@ fn main() {
         day21::Day21,
         (FromFile("day21.txt"), 19361414),
         (FromFile("day21.txt"), 1139205618),
+    );
+
+    run_day(
+        day,
+        times,
+        day22::Day22,
+        (FromFile("day22.txt"), 6850),
+        (FromFile("day22.txt"), 13224103523662),
     );
 
     let elapsed = t0.elapsed();

@@ -27,3 +27,6 @@ version = "1.3.1"
 
 [dependencies.pathfinding]
 version = "2.0.2"
+
+[dependencies.mod_exp]
+version = "1.0.1"

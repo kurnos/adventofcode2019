@@ -1,4 +1,3 @@
-use clipboard_win::Clipboard;
 use std::fs;
 use std::str;
 use std::time::Instant;
@@ -29,13 +28,13 @@ impl<T> InputProvider<T> for Literal<T> {
     }
 }
 
-pub struct FromClipboard;
+// pub struct FromClipboard;
 
-impl InputProvider<String> for FromClipboard {
-    fn get_input(self) -> String {
-        Clipboard::new().unwrap().get_string().unwrap()
-    }
-}
+// impl InputProvider<String> for FromClipboard {
+//     fn get_input(self) -> String {
+//         Clipboard::new().unwrap().get_string().unwrap()
+//     }
+// }
 
 pub fn run_day<P, I1, I2, R1, R2, IP1, IP2>(
     day: Option<u8>,
