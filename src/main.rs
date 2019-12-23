@@ -9,7 +9,6 @@ use std::env;
 use std::time::Instant;
 
 mod computer;
-mod day22;
 mod day01;
 mod day02;
 mod day03;
@@ -31,6 +30,8 @@ mod day18;
 mod day19;
 mod day20;
 mod day21;
+mod day22;
+mod day23;
 mod infra;
 mod utils;
 
@@ -218,6 +219,14 @@ fn main() {
         day22::Day22,
         (FromFile("day22.txt"), 6850),
         (FromFile("day22.txt"), 13224103523662),
+    );
+
+    run_day(
+        day,
+        times,
+        day23::Day23,
+        (FromFile("day23.txt"), 22829),
+        (FromFile("day23.txt"), 15678),
     );
 
     let elapsed = t0.elapsed();
