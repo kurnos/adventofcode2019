@@ -32,6 +32,7 @@ mod day20;
 mod day21;
 mod day22;
 mod day23;
+mod day24;
 mod infra;
 mod utils;
 
@@ -227,6 +228,14 @@ fn main() {
         day23::Day23,
         (FromFile("day23.txt"), 22829),
         (FromFile("day23.txt"), 15678),
+    );
+
+    run_day(
+        day,
+        times,
+        day24::Day24,
+        (FromFile("day24.txt"), 28778811),
+        (FromFile("day24.txt"), 2097),
     );
 
     let elapsed = t0.elapsed();
