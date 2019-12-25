@@ -75,7 +75,14 @@ where
     pub fn run(&mut self) -> ComputerState<T> {
         match self.state {
             ComputerState::NotYetStarted | ComputerState::HasOutput(_) => self.exec(),
-            _ => panic!("Invalid state"),
+            _ => panic!(format!(
+                "Invalid state {}",
+                match self.state {
+                    ComputerState::WaitingForInput => "WaitingForInput",
+                    ComputerState::Terminated => "Terminated",
+                    _ => "",
+                }
+            )),
         }
     }
 
@@ -85,7 +92,14 @@ where
                 self.write(self.input_pos.unwrap(), input);
                 self.exec()
             }
-            _ => panic!("Invalid state"),
+            _ => panic!(format!(
+                "Invalid state {}",
+                match self.state {
+                    ComputerState::HasOutput(_) => "Output",
+                    ComputerState::Terminated => "Terminated",
+                    _ => "",
+                }
+            )),
         }
     }
 
