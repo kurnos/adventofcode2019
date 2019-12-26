@@ -1,35 +1,6 @@
 use crate::infra::Problem;
-use crate::utils::{Dir, Point2d};
-use bit_set::BitSet;
-use itertools::Either::{Left, Right};
-use rayon::prelude::*;
-use std::collections::{HashMap, HashSet};
-use std::convert::TryInto;
-
-type Pos = Point2d<i8>;
-struct Board(BitSet);
-
-impl Board {
-    fn new() -> Board {
-        Board(BitSet::with_capacity(25))
-    }
-
-    fn is_bug(&self, p: Pos) -> bool {
-        p.x >= 0 && p.y >= 0 && self.0.contains((p.x * 6 + p.y) as usize)
-    }
-
-    fn add_bug(&mut self, p: Pos) {
-        self.0.insert((p.x * 6 + p.y) as usize);
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    fn count_bugs(&self) -> usize {
-        self.0.len()
-    }
-}
+use itertools::Itertools;
+use std::collections::{HashSet, VecDeque};
 
 pub struct Day24;
 
@@ -42,128 +13,92 @@ impl Problem<String, String, u32, usize> for Day24 {
         let mut seen = HashSet::new();
 
         loop {
-            b = evolve(b);
-            let s = score(&b);
-            if seen.contains(&s) {
-                println!("{}", s);
-                return s;
+            let br = (b & 0b01111_01111_01111_01111_01111 as u32) << 1;
+            let bl = (b & 0b11110_11110_11110_11110_11110 as u32) >> 1;
+            let bd = (b & 0b00000_11111_11111_11111_11111 as u32) << 5;
+            let bu = (b & 0b11111_11111_11111_11111_00000 as u32) >> 5;
+            b = br & !bl & !bd & !bu
+                | !br & bl & !bd & !bu
+                | !br & !bl & bd & !bu
+                | !br & !bl & !bd & bu
+                | !b & br & bl & !bd & !bu
+                | !b & br & !bl & bd & !bu
+                | !b & br & !bl & !bd & bu
+                | !b & !br & bl & bd & !bu
+                | !b & !br & bl & !bd & bu
+                | !b & !br & !bl & bd & bu;
+            if seen.contains(&b) {
+                return b;
             }
-            seen.insert(s);
+            seen.insert(b);
         }
     }
+
     fn second(contents: String) -> usize {
-        let mut boards = HashMap::<i32, Board>::new();
-        boards.insert(0, parse_board(&contents));
-        (0..200)
-            .fold(boards, |b, _| evolve2(b))
-            .values()
-            .map(|b| b.count_bugs())
-            .sum()
+        let mut boards = VecDeque::new();
+        boards.push_back(0);
+        boards.push_back(0);
+        boards.push_back(parse_board(&contents));
+        boards.push_back(0);
+        boards.push_back(0);
+
+        for _ in 0..200 {
+            let mut res = VecDeque::new();
+            for (inner, board, outer) in boards.into_iter().tuple_windows() {
+                res.push_back(b_evolve2(inner, board, outer));
+            }
+            while res[0] != 0 || res[1] != 0 {
+                res.push_front(0);
+            }
+            while res[res.len() - 1] != 0 || res[res.len() - 2] != 0 {
+                res.push_back(0);
+            }
+            boards = res;
+        }
+
+        boards.into_iter().map(|b| b.count_ones()).sum::<u32>() as usize
     }
 }
 
-fn evolve2(boards: HashMap<i32, Board>) -> HashMap<i32, Board> {
-    let min_i = boards.keys().cloned().min().unwrap();
-    let max_i = boards.keys().cloned().max().unwrap();
+fn b_evolve2(inner: u32, b: u32, outer: u32) -> u32 {
+    let mu = (inner & 0b11111_00000_00000_00000_00000 | (b & 0b00100_01010_00000_00000_00000) >> 3)
+        .count_ones();
+    let ml = (inner & 0b10000_10000_10000_10000_10000 | (b & 0b00000_01000_10000_01000_00000) >> 1)
+        .count_ones();
+    let mr = (inner & 0b00001_00001_00001_00001_00001 | (b & 0b00000_00010_00001_00010_00000) << 1)
+        .count_ones();
+    let md = (inner & 0b00000_00000_00000_00000_11111 | (b & 0b00000_00000_00000_01010_00100) << 3)
+        .count_ones();
 
-    (min_i - 1..=max_i + 1)
-        .into_par_iter()
-        .map(|i| {
-            let mut new_board = Board::new();
-            for (x, y) in iproduct!(0..5, 0..5) {
-                if (x, y) == (2, 2) {
-                    continue;
-                }
-                let p = Pos::new(x, y);
-
-                let live = neighbours_rec(i, p)
-                    .filter(|(i, np)| boards.get(&i).map(|b| b.is_bug(*np)).unwrap_or_default())
-                    .count();
-
-                if boards.get(&i).map(|b| b.is_bug(p)).unwrap_or_default() {
-                    if live == 1 {
-                        new_board.add_bug(p);
-                    }
-                } else if live == 1 || live == 2 {
-                    new_board.add_bug(p);
-                }
-            }
-            (i, new_board)
-        })
-        .filter(|(_, b)| !b.is_empty())
-        .collect()
+    let br = ((b & 0b01111_01111_01111_01111_01111 as u32) << 1)
+        | (0b00001_00001_00001_00001_00001 * ((outer >> 11) & 1));
+    let bl = ((b & 0b11110_11110_11110_11110_11110 as u32) >> 1)
+        | (0b10000_10000_10000_10000_10000 * ((outer >> 13) & 1));
+    let bd = ((b & 0b00000_11111_11111_11111_11111 as u32) << 5)
+        | (0b00000_00000_00000_00000_11111 * ((outer >> 7) & 1));
+    let bu = ((b & 0b11111_11111_11111_11111_00000 as u32) >> 5)
+        | (0b11111_00000_00000_00000_00000 * ((outer >> 17) & 1));
+    0b11111_11011_10001_11011_11111
+        & (br & !bl & !bd & !bu
+            | !br & bl & !bd & !bu
+            | !br & !bl & bd & !bu
+            | !br & !bl & !bd & bu
+            | !b & br & bl & !bd & !bu
+            | !b & br & !bl & bd & !bu
+            | !b & br & !bl & !bd & bu
+            | !b & !br & bl & bd & !bu
+            | !b & !br & bl & !bd & bu
+            | !b & !br & !bl & bd & bu)
+        | ((mu == 1 || ((b >> 17) & 1) == 0 && mu == 2) as u32) << 17
+        | ((ml == 1 || ((b >> 13) & 1) == 0 && ml == 2) as u32) << 13
+        | ((mr == 1 || ((b >> 11) & 1) == 0 && mr == 2) as u32) << 11
+        | ((md == 1 || ((b >> 7) & 1) == 0 && md == 2) as u32) << 7
 }
 
-fn neighbours_rec(i: i32, t: Pos) -> impl Iterator<Item = (i32, Pos)> {
-    [Dir::East, Dir::West, Dir::South, Dir::North]
-        .iter()
-        .flat_map(move |&d| {
-            let p = t + d;
-            if p.x == -1 {
-                Left(std::iter::once((i - 1, Pos::new(1, 2))))
-            } else if p.x == 5 {
-                Left(std::iter::once((i - 1, Pos::new(3, 2))))
-            } else if p.y == -1 {
-                Left(std::iter::once((i - 1, Pos::new(2, 1))))
-            } else if p.y == 5 {
-                Left(std::iter::once((i - 1, Pos::new(2, 3))))
-            } else if (p.x, p.y) == (2, 2) {
-                Right((0..5).map(move |j| match d {
-                    Dir::South => (i + 1, Pos::new(j, 0)),
-                    Dir::North => (i + 1, Pos::new(j, 4)),
-                    Dir::East => (i + 1, Pos::new(0, j)),
-                    Dir::West => (i + 1, Pos::new(4, j)),
-                }))
-            } else {
-                Left(std::iter::once((i, p)))
-            }
-        })
-}
-
-fn score(board: &Board) -> u32 {
-    let mut d = 1u32;
-    let mut s = 0;
-    for y in 0..5 {
-        for x in 0..5 {
-            if board.is_bug(Pos::new(x, y)) {
-                s += d;
-            }
-            d *= 2;
-        }
-    }
-    s
-}
-
-fn parse_board(c: &str) -> Board {
-    let mut res = Board::new();
-    for (y, line) in c.lines().enumerate() {
-        if line.is_empty() {
-            continue;
-        }
-        for (x, c) in line.trim().split("").skip(1).enumerate() {
-            if c == "#" {
-                res.add_bug(Pos::new(x.try_into().unwrap(), y.try_into().unwrap()));
-            }
-        }
-    }
-    res
-}
-
-fn evolve(board: Board) -> Board {
-    let mut res = Board::new();
-    for (x, y) in iproduct!(0..5, 0..5) {
-        let p = Pos::new(x, y);
-        let live = [Dir::North, Dir::East, Dir::West, Dir::South]
-            .iter()
-            .filter(|&&d| board.is_bug(p + d))
-            .count();
-        if board.is_bug(p) {
-            if live == 1 {
-                res.add_bug(p);
-            }
-        } else if live == 1 || live == 2 {
-            res.add_bug(p);
-        }
-    }
-    res
+fn parse_board(contents: &str) -> u32 {
+    contents
+        .lines()
+        .flat_map(|line| line.chars())
+        .rev()
+        .fold(0, |x, c| 2 * x + (c == '#') as u32)
 }
