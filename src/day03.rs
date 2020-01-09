@@ -1,4 +1,5 @@
 use crate::infra::Problem;
+use crate::utils::{Dir, Point2d};
 use std::cmp::min;
 
 #[derive(Debug)]
@@ -131,45 +132,31 @@ fn intersects(a: &Seg, b: &Seg) -> bool {
 
 fn parse_wire(wire: &str) -> Vec<(i32, Seg)> {
     wire.split(',')
-        .scan((0i32, 0i32, 0i32), |state, p| {
-            let (start, x, y) = *state;
-            let d = &p[1..].parse::<i32>().unwrap();
+        .scan((0i32, Point2d::new(0, 0)), |state, p| {
+            let (start, p0) = *state;
+            let (head, tail) = p.split_at(1);
+            let d = tail.parse::<i32>().unwrap();
+            let dir = match head.as_bytes()[0] {
+                b'D' => Dir::North,
+                b'U' => Dir::South,
+                b'R' => Dir::West,
+                b'L' => Dir::East,
+                _ => unreachable!(),
+            };
+            *state = (start + d, p0.advance(dir, d));
             Some((
                 start,
-                match &p[0..1] {
-                    "U" => {
-                        *state = (start + d, x, y + d);
-                        Seg::V {
-                            x,
-                            y0: y,
-                            y1: y + d,
-                        }
-                    }
-                    "D" => {
-                        *state = (start + d, x, y - d);
-                        Seg::V {
-                            x,
-                            y0: y,
-                            y1: y - d,
-                        }
-                    }
-                    "L" => {
-                        *state = (start + d, x - d, y);
-                        Seg::H {
-                            y,
-                            x0: x,
-                            x1: x - d,
-                        }
-                    }
-                    "R" => {
-                        *state = (start + d, x + d, y);
-                        Seg::H {
-                            y,
-                            x0: x,
-                            x1: x + d,
-                        }
-                    }
-                    _ => panic!(),
+                match dir {
+                    Dir::North | Dir::South => Seg::V {
+                        x: p0.x,
+                        y0: p0.y,
+                        y1: p0.y + d,
+                    },
+                    Dir::East | Dir::West => Seg::H {
+                        x0: p0.x,
+                        y: p0.y,
+                        x1: p0.x + d,
+                    },
                 },
             ))
         })

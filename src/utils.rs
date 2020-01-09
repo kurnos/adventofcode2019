@@ -13,6 +13,34 @@ impl<T> Point2d<T> {
     }
 }
 
+impl<T> Point2d<T>
+where
+    T: std::ops::Sub<Output = T>,
+    T: std::ops::Add<Output = T>,
+    T: std::marker::Copy,
+{
+    pub fn advance(&self, dir: Dir, d: T) -> Self {
+        match dir {
+            Dir::North => Point2d {
+                x: self.x,
+                y: self.y - d,
+            },
+            Dir::South => Point2d {
+                x: self.x,
+                y: self.y + d,
+            },
+            Dir::West => Point2d {
+                x: self.x - d,
+                y: self.y,
+            },
+            Dir::East => Point2d {
+                x: self.x + d,
+                y: self.y,
+            },
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Dir {
     North,
@@ -45,29 +73,13 @@ impl<T> std::ops::Add<Dir> for Point2d<T>
 where
     T: std::ops::Sub<Output = T>,
     T: std::ops::Add<Output = T>,
+    T: std::marker::Copy,
     T: num::One,
 {
     type Output = Point2d<T>;
     #[allow(clippy::suspicious_arithmetic_impl)]
     fn add(self, rhs: Dir) -> Self::Output {
-        match rhs {
-            Dir::North => Point2d {
-                x: self.x,
-                y: self.y - T::one(),
-            },
-            Dir::South => Point2d {
-                x: self.x,
-                y: self.y + T::one(),
-            },
-            Dir::West => Point2d {
-                x: self.x - T::one(),
-                y: self.y,
-            },
-            Dir::East => Point2d {
-                x: self.x + T::one(),
-                y: self.y,
-            },
-        }
+        self.advance(rhs, T::one())
     }
 }
 
