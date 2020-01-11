@@ -1,6 +1,5 @@
 use crate::infra::Problem;
 use crate::utils::Dir;
-use itertools::Either::{Left, Right};
 use pathfinding::directed::dijkstra;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -20,12 +19,19 @@ impl Problem<String, String, i32, i32> for Day18 {
     }
     fn first(contents: String) -> i32 {
         let g = Grid::new(contents);
-
-        let all_keys = (1u32 << (b'z' - b'a' + 1)) - 1;
+        let all_keys = g.keys().fold(0, |a, x| a | x.1);
+        let center = g.find('@').unwrap();
+        let neighbours = calc_all_costs(&g, &[center]);
 
         dijkstra::dijkstra(
-            &(Pos(g.map.find('@').unwrap()), 0u32),
-            |&(p, keys)| successors(&g, p, keys),
+            &(center, 0u32),
+            |&(p, keys)| {
+                neighbours[&p]
+                    .iter()
+                    .filter(|(_, doors, _, _)| doors | keys == keys)
+                    .map(move |(to, _, new_keys, cost)| ((*to, keys | new_keys), *cost))
+                    .collect::<Vec<((Pos, u32), i32)>>()
+            },
             |&(_, keys)| keys == all_keys,
         )
         .unwrap()
@@ -33,38 +39,46 @@ impl Problem<String, String, i32, i32> for Day18 {
     }
     fn second(contents: String) -> i32 {
         let mut grid = Grid::new(contents);
-        let center = grid.map.find('@').unwrap();
+        let center = grid.find('@').unwrap();
         unsafe {
             let bytes = grid.map.as_bytes_mut();
-            bytes[center] = b'#';
-            bytes[center + 1] = b'#';
-            bytes[center - 1] = b'#';
-            bytes[center + grid.width] = b'#';
-            bytes[center - grid.width] = b'#';
+            bytes[center.0] = b'#';
+            bytes[center.0 + 1] = b'#';
+            bytes[center.0 - 1] = b'#';
+            bytes[center.0 + grid.width] = b'#';
+            bytes[center.0 - grid.width] = b'#';
         }
 
-        let all_keys = (1u32 << (b'z' - b'a' + 1)) - 1;
+        let neighbours = calc_all_costs(
+            &grid,
+            &iproduct!(&[Dir::North, Dir::South], &[Dir::East, Dir::West])
+                .map(|(&a, &b)| grid.advance(grid.advance(center, a), b))
+                .collect::<Vec<Pos>>(),
+        );
+
+        let all_keys = grid.keys().fold(0, |a, x| a | x.1);
 
         dijkstra::dijkstra(
             &(
                 [
-                    Pos(center + 1 + grid.width),
-                    Pos(center + 1 - grid.width),
-                    Pos(center - 1 + grid.width),
-                    Pos(center - 1 - grid.width),
+                    Pos(center.0 + 1 + grid.width),
+                    Pos(center.0 + 1 - grid.width),
+                    Pos(center.0 - 1 + grid.width),
+                    Pos(center.0 - 1 - grid.width),
                 ],
                 0u32,
             ),
             |&(ps, keys)| {
-                ps.par_iter()
+                ps.iter()
                     .enumerate()
-                    .flat_map(|(i, p): (usize, &Pos)| {
-                        cost_to_keys(&grid, (*p, keys))
-                            .into_par_iter()
-                            .map(move |(k, (p, c))| {
+                    .flat_map(|(i, p)| {
+                        neighbours[p]
+                            .iter()
+                            .filter(|(_, doors, _, _)| doors | keys == keys)
+                            .map(move |(to, _, new_keys, cost)| {
                                 let mut r = ps;
-                                r[i] = p;
-                                ((r, k), c)
+                                r[i] = *to;
+                                ((r, keys | new_keys), *cost)
                             })
                     })
                     .collect::<Vec<(([Pos; 4], u32), i32)>>()
@@ -76,27 +90,39 @@ impl Problem<String, String, i32, i32> for Day18 {
     }
 }
 
-fn cost_to_keys(grid: &Grid, start: (Pos, u32)) -> HashMap<u32, (Pos, i32)> {
-    let mut res = HashMap::new();
-    for (_, ((p, k), c)) in dijkstra::dijkstra_all(&start, |&(p, keys)| {
-        if keys.count_ones() <= start.1.count_ones() + 1 {
-            Left(successors(&grid, p, keys))
-        } else {
-            Right(std::iter::empty())
-        }
-    }) {
-        let c = c - 1; // -1 ??
-        if k > start.1 {
-            res.entry(k)
-                .and_modify(|v: &mut (Pos, i32)| {
-                    if c < v.1 {
-                        *v = (p, c);
+fn calc_all_costs(grid: &Grid, starts: &[Pos]) -> HashMap<Pos, Vec<(Pos, u32, u32, i32)>> {
+    let key_positions = grid.keys().map(|x| x.0).collect::<Vec<_>>();
+    starts
+        .par_iter()
+        .chain(key_positions.par_iter())
+        .cloned()
+        .map(|s| (s, calc_costs(grid, s, &key_positions)))
+        .collect()
+}
+
+fn calc_costs(grid: &Grid, from: Pos, targets: &[Pos]) -> Vec<(Pos, u32, u32, i32)> {
+    let parents = dijkstra::dijkstra_all(&from, |&p| grid.neighbours(p).map(|(p, _)| (p, 1)));
+    targets
+        .iter()
+        .filter_map(|t| {
+            parents.get(t).and_then(|p| {
+                let mut doors = 0u32;
+                let mut keys = 0u32;
+                for p_n in dijkstra::build_path(t, &parents).into_iter().skip(1) {
+                    match grid.get(p_n) {
+                        Some(S::Door(d)) => doors |= d,
+                        Some(S::Key(k)) => keys |= k,
+                        _ => {}
                     }
-                })
-                .or_insert((p, c));
-        }
-    }
-    res
+                }
+                if keys.count_ones() == 1 {
+                    Some((*t, doors, keys, p.1))
+                } else {
+                    None
+                }
+            })
+        })
+        .collect()
 }
 
 struct Grid {
@@ -109,23 +135,44 @@ struct Pos(usize);
 
 impl Grid {
     fn new(map: String) -> Grid {
-        let width = map.lines().next().unwrap().len() + 2;
+        let (a, b) = {
+            let mut lines = map.lines();
+            (lines.next().unwrap(), lines.next().unwrap())
+        };
+
+        let width = (b.as_ptr() as usize) - (a.as_ptr() as usize);
         Grid { map, width }
     }
 
+    fn keys<'a>(&'a self) -> impl 'a + Iterator<Item = (Pos, u32)> {
+        self.map
+            .as_bytes()
+            .iter()
+            .enumerate()
+            .filter_map(|(i, b)| match b {
+                b'.' | b'@' => None,
+                k if k.is_ascii_lowercase() => Some((Pos(i), 1 << (k - b'a'))),
+                _ => None,
+            })
+    }
+
+    fn find(&self, needle: char) -> Option<Pos> {
+        self.map.find(needle).map(Pos)
+    }
+
     fn get(&self, p: Pos) -> Option<S> {
-        match self.map[p.0..=p.0].chars().next().unwrap() {
-            '.' | '@' => Some(S::Empty),
-            k if k.is_ascii_lowercase() => Some(S::Key(1 << ((k as u8) - b'a'))),
-            d if d.is_ascii_uppercase() => Some(S::Door(1 << ((d as u8) - b'A'))),
+        match self.map.as_bytes()[p.0] {
+            b'.' | b'@' => Some(S::Empty),
+            k if k.is_ascii_lowercase() => Some(S::Key(1 << (k - b'a'))),
+            d if d.is_ascii_uppercase() => Some(S::Door(1 << (d - b'A'))),
             _ => None,
         }
     }
 
     fn neighbours<'a>(&'a self, pos: Pos) -> impl 'a + Iterator<Item = (Pos, S)> {
-        vec![Dir::North, Dir::East, Dir::West, Dir::South]
-            .into_iter()
-            .map(move |d| self.advance(pos, d))
+        (&[Dir::North, Dir::East, Dir::West, Dir::South])
+            .iter()
+            .map(move |&d| self.advance(pos, d))
             .flat_map(move |p| self.get(p).map(|s| (p, s)))
     }
 
@@ -137,16 +184,4 @@ impl Grid {
             Dir::South => Pos(pos.0 + self.width),
         }
     }
-}
-
-fn successors<'a>(
-    grid: &'a Grid,
-    p: Pos,
-    keys: u32,
-) -> impl 'a + Iterator<Item = ((Pos, u32), i32)> {
-    grid.neighbours(p).flat_map(move |(t, s)| match s {
-        S::Door(d) if d & keys == 0 => None,
-        S::Key(k) => Some(((t, keys | k), 1i32)),
-        _ => Some(((t, keys), 1i32)),
-    })
 }
