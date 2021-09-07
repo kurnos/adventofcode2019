@@ -1,5 +1,8 @@
+use colored::*;
+use std::fmt::Display;
 use std::fs;
 use std::str;
+use std::time::Duration;
 use std::time::Instant;
 
 pub trait InputProvider<T> {
@@ -73,6 +76,19 @@ pub fn run_day<P, I1, I2, R1, R2, IP1, IP2>(
         assert_eq!(r2, second.1);
         println!("Day{}a: {:?}", my_day, r1);
         println!("Day{}b: {:?}", my_day, r2);
-        println!("{:?} ({:?} and {:?})", t1 + t2, t1, t2);
+        println!("{:?} ({} and {})", t1 + t2, fmt_time(t1), fmt_time(t2));
+    }
+}
+
+fn fmt_time(t: Duration) -> impl Display {
+    let res = format!("{:?}", t);
+    if t < Duration::from_micros(100) {
+        res.bright_green()
+    } else if t < Duration::from_millis(1) {
+        res.green()
+    } else if t < Duration::from_millis(10) {
+        res.red()
+    } else {
+        res.bright_red()
     }
 }
