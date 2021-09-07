@@ -69,7 +69,7 @@ struct Pos(usize);
 
 #[derive(Debug)]
 struct Maze {
-    map: String,
+    map: Vec<u8>,
     width: usize,
     height: usize,
     inner_portals: HashMap<u16, Pos>,
@@ -91,10 +91,10 @@ fn b_to_portal(a: u8, b: u8) -> u16 {
 
 impl Maze {
     fn new(map: String) -> Maze {
-        let width = map.lines().next().unwrap().len() + 2;
+        let width = map.find('\n').unwrap() + 1;
         let height = map.lines().filter(|s| !s.trim().is_empty()).count();
         let mut res = Maze {
-            map,
+            map: map.into_bytes(),
             width,
             height,
             inner_portals: HashMap::new(),
@@ -119,12 +119,12 @@ impl Maze {
     }
 
     fn get_byte(&self, p: Pos) -> u8 {
-        self.map.as_bytes()[p.0]
+        self.map[p.0]
     }
 
     #[allow(clippy::many_single_char_names)]
     fn get(&self, p: Pos) -> Option<S> {
-        match self.map.as_bytes()[p.0] {
+        match self.map[p.0] {
             b'.' => Some(S::Empty),
             c if c.is_ascii_uppercase() => {
                 let (x, y) = (p.0 % self.width, p.0 / self.width);
