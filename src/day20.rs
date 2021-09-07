@@ -164,7 +164,7 @@ impl Maze {
         }
     }
 
-    fn neighbours<'a>(&'a self, pos: Pos) -> impl 'a + Iterator<Item = (Pos, S)> {
+    fn neighbours(&self, pos: Pos) -> impl Iterator<Item = (Pos, S)> + '_ {
         vec![Dir::North, Dir::East, Dir::West, Dir::South]
             .into_iter()
             .flat_map(move |d| self.try_advance(pos, d))

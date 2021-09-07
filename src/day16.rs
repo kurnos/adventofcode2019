@@ -12,7 +12,7 @@ impl Problem<String, String, i32, i32> for Day16 {
         for _ in 0..100 {
             nums = phase(&nums);
         }
-        nums[..8].iter().fold(0 as i32, |a, &x| 10 * a + x as i32)
+        nums[..8].iter().fold(0_i32, |a, &x| 10 * a + x as i32)
     }
     fn second(contents: String) -> i32 {
         let offset: usize = contents[..7].parse().unwrap();
@@ -38,7 +38,7 @@ impl Problem<String, String, i32, i32> for Day16 {
                 nums[i] = cumsum4;
             }
         }
-        nums[..8].iter().fold(0 as i32, |a, &x| 10 * a + x as i32)
+        nums[..8].iter().fold(0_i32, |a, &x| 10 * a + x as i32)
     }
 }
 
@@ -69,7 +69,7 @@ fn parse_nums(contents: &str) -> Vec<i8> {
     contents
         .trim()
         .split("")
-        .filter(|&c| c != "")
+        .filter(|&c| !c.is_empty())
         .map(|c| c.parse().unwrap())
         .collect()
 }

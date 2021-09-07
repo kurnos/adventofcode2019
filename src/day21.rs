@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 use crate::computer::Computer;
 use crate::infra::Problem;
 use itertools::Itertools;

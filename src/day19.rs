@@ -51,11 +51,11 @@ fn find_slopes(mem: &[i64]) -> (Rational64, Rational64) {
 
     for y in (1..=5).map(|p| num::pow::pow(10, p)) {
         low = Rational64::new(
-            find_next_edge(&mem, Point2d::new((low * y).to_integer(), y), Dir::East).x - 1,
+            find_next_edge(mem, Point2d::new((low * y).to_integer(), y), Dir::East).x - 1,
             y,
         );
         high = Rational64::new(
-            find_next_edge(&mem, Point2d::new((high * y).to_integer(), y), Dir::West).x + 1,
+            find_next_edge(mem, Point2d::new((high * y).to_integer(), y), Dir::West).x + 1,
             y,
         );
     }

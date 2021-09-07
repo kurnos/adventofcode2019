@@ -77,16 +77,13 @@ impl Problem<String, String, String, ()> for Day25 {
                     }
                     if dirs.contains(&d.cw()) {
                         d = d.cw();
-                        walk(cpu, d);
                     } else if dirs.contains(&d) {
-                        walk(cpu, d);
                     } else if dirs.contains(&d.ccw()) {
                         d = d.ccw();
-                        walk(cpu, d);
                     } else {
                         d = d.cw().cw();
-                        walk(cpu, d);
                     }
+                    walk(cpu, d);
                     seen.insert(room.to_owned());
                     s.clear();
                 }

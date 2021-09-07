@@ -45,10 +45,7 @@ where
         }
     }
     pub fn is_terminated(&self) -> bool {
-        match self.state {
-            ComputerState::Terminated => true,
-            _ => false,
-        }
+        matches!(self.state, ComputerState::Terminated)
     }
 
     pub fn run_through(&mut self, mut input: Vec<T>) -> Vec<T> {
@@ -75,14 +72,14 @@ where
     pub fn run(&mut self) -> ComputerState<T> {
         match self.state {
             ComputerState::NotYetStarted | ComputerState::HasOutput(_) => self.exec(),
-            _ => panic!(format!(
+            _ => panic!(
                 "Invalid state {}",
                 match self.state {
                     ComputerState::WaitingForInput => "WaitingForInput",
                     ComputerState::Terminated => "Terminated",
                     _ => "",
                 }
-            )),
+            ),
         }
     }
 
@@ -92,14 +89,14 @@ where
                 self.write(self.input_pos.unwrap(), input);
                 self.exec()
             }
-            _ => panic!(format!(
+            _ => panic!(
                 "Invalid state {}",
                 match self.state {
                     ComputerState::HasOutput(_) => "Output",
                     ComputerState::Terminated => "Terminated",
                     _ => "",
                 }
-            )),
+            ),
         }
     }
 
@@ -180,7 +177,7 @@ where
                     let p1 = self.pop(op / 100);
                     self.relative_base += self.read(p1);
                 }
-                opcode => panic!(format!("unknown command {}", opcode)),
+                opcode => panic!("unknown command {}", opcode),
             };
         }
         self.state

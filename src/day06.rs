@@ -41,7 +41,7 @@ impl Problem<String, String, i32, i32> for Day6 {
 fn get_orbits(contents: &str) -> HashMap<&str, Vec<&str>> {
     let mut orbits = HashMap::<&str, Vec<&str>>::new();
     for (c, s) in contents.lines().map(|o| o.split_at(3)) {
-        orbits.entry(c).or_insert_with(|| vec![]).push(&s[1..]);
+        orbits.entry(c).or_insert_with(Vec::new).push(&s[1..]);
     }
     orbits
 }

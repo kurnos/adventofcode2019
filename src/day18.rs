@@ -144,7 +144,7 @@ impl Grid {
         Grid { map, width }
     }
 
-    fn keys<'a>(&'a self) -> impl 'a + Iterator<Item = (Pos, u32)> {
+    fn keys(&self) -> impl Iterator<Item = (Pos, u32)> + '_ {
         self.map
             .as_bytes()
             .iter()
@@ -169,7 +169,7 @@ impl Grid {
         }
     }
 
-    fn neighbours<'a>(&'a self, pos: Pos) -> impl 'a + Iterator<Item = (Pos, S)> {
+    fn neighbours(&self, pos: Pos) -> impl Iterator<Item = (Pos, S)> + '_ {
         (&[Dir::North, Dir::East, Dir::West, Dir::South])
             .iter()
             .map(move |&d| self.advance(pos, d))

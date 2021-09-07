@@ -8,9 +8,9 @@ pub struct Day15;
 
 type Pos = Point2d<i16>;
 
-impl Into<i16> for Dir {
-    fn into(self) -> i16 {
-        match self {
+impl From<Dir> for i16 {
+    fn from(d: Dir) -> Self {
+        match d {
             Dir::North => 1,
             Dir::South => 2,
             Dir::West => 3,

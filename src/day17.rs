@@ -69,7 +69,7 @@ impl Problem<String, String, i16, i64> for Day17 {
 }
 
 fn get_scaffolding2(contents: &str) -> (Point2d<i16>, HashSet<Point2d<i16>>) {
-    let mut cpu = Computer::<i64>::from_str(&contents);
+    let mut cpu = Computer::<i64>::from_str(contents);
     let x = cpu.run_through(vec![]);
     let board = x.iter().map(|&c| (c as u8) as char).collect::<String>();
 
