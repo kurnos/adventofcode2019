@@ -5,10 +5,7 @@ use std::collections::HashMap;
 
 pub struct Day11;
 
-impl Problem<String, String, usize, String> for Day11 {
-    fn day() -> u8 {
-        11
-    }
+impl Problem<String, String, usize, String, 11> for Day11 {
     fn first(contents: String) -> usize {
         paint(Computer::from_str(&contents), 0).len()
     }

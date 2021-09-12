@@ -10,10 +10,7 @@ pub struct Day20;
 const PORTAL_ZZ: u16 = 2525;
 const PORTAL_AA: u16 = 0;
 
-impl Problem<String, String, i32, i32> for Day20 {
-    fn day() -> u8 {
-        20
-    }
+impl Problem<String, String, i32, i32, 20> for Day20 {
     fn first(contents: String) -> i32 {
         assert_eq!(PORTAL_ZZ, b_to_portal(b'Z', b'Z'));
         assert_eq!(PORTAL_AA, b_to_portal(b'A', b'A'));

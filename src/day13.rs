@@ -5,10 +5,7 @@ use std::cmp::Ordering;
 
 pub struct Day13;
 
-impl Problem<String, String, usize, i32> for Day13 {
-    fn day() -> u8 {
-        13
-    }
+impl Problem<String, String, usize, i32, 13> for Day13 {
     fn first(contents: String) -> usize {
         Computer::<i32>::from_str(&contents)
             .tuples()

@@ -19,10 +19,7 @@ impl From<Dir> for i16 {
     }
 }
 
-impl Problem<String, String, usize, usize> for Day15 {
-    fn day() -> u8 {
-        15
-    }
+impl Problem<String, String, usize, usize, 15> for Day15 {
     fn first(contents: String) -> usize {
         let (target, graph) = map_ship(&contents);
         let costs = dijkstra(&graph, Pos::new(0, 0), Some(target), |_| 1);

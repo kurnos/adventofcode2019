@@ -7,10 +7,7 @@ pub struct Day25;
 
 type Cpu = Computer<i64>;
 
-impl Problem<String, String, String, ()> for Day25 {
-    fn day() -> u8 {
-        25
-    }
+impl Problem<String, String, String, (), 25> for Day25 {
     fn first(contents: String) -> String {
         let mut cpu = Cpu::from_str(&contents);
         let cpu = &mut cpu;

@@ -2,10 +2,7 @@ use crate::infra::Problem;
 
 pub struct Day1;
 
-impl Problem<String, String, u32, i32> for Day1 {
-    fn day() -> u8 {
-        1
-    }
+impl Problem<String, String, u32, i32, 1> for Day1 {
     fn first(contents: String) -> u32 {
         contents
             .lines()

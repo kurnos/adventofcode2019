@@ -5,10 +5,7 @@ use num::rational::Rational64;
 
 pub struct Day19;
 
-impl Problem<String, String, i64, i64> for Day19 {
-    fn day() -> u8 {
-        19
-    }
+impl Problem<String, String, i64, i64, 19> for Day19 {
     #[allow(clippy::mut_range_bound)]
     fn first(contents: String) -> i64 {
         let mem = parse_memory(&contents);

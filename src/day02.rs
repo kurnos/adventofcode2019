@@ -3,10 +3,7 @@ use crate::infra::Problem;
 
 pub struct Day2;
 
-impl Problem<String, String, i32, i32> for Day2 {
-    fn day() -> u8 {
-        2
-    }
+impl Problem<String, String, i32, i32, 2> for Day2 {
     fn first(contents: String) -> i32 {
         trial(&parse_memory(&contents), 12, 2)
     }

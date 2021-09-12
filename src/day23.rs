@@ -5,10 +5,7 @@ use std::collections::VecDeque;
 
 pub struct Day23;
 
-impl Problem<String, String, i64, i64> for Day23 {
-    fn day() -> u8 {
-        23
-    }
+impl Problem<String, String, i64, i64, 23> for Day23 {
     fn first(contents: String) -> i64 {
         run_network(&contents, |_, _| true)
     }

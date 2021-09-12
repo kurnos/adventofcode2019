@@ -6,10 +6,7 @@ use petgraph::graphmap::DiGraphMap;
 
 pub struct Day14;
 
-impl Problem<String, String, u64, u64> for Day14 {
-    fn day() -> u8 {
-        14
-    }
+impl Problem<String, String, u64, u64, 14> for Day14 {
     fn first(contents: String) -> u64 {
         let (order, costs) = parse_reactions(&contents);
         required_ore(&costs, &order, 1)

@@ -2,10 +2,7 @@ use crate::infra::Problem;
 
 pub struct Day4;
 
-impl Problem<(u32, u32), (u32, u32), u32, u32> for Day4 {
-    fn day() -> u8 {
-        4
-    }
+impl Problem<(u32, u32), (u32, u32), u32, u32, 4> for Day4 {
     fn first((low, high): (u32, u32)) -> u32 {
         Ascending::larger_than(low)
             .take_while(|&n| n < high)

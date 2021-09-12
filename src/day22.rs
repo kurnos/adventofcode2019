@@ -12,10 +12,7 @@ enum Cmd {
     DealCut(i64, i64),
 }
 
-impl Problem<String, String, i64, i64> for Day22 {
-    fn day() -> u8 {
-        22
-    }
+impl Problem<String, String, i64, i64, 22> for Day22 {
     fn first(contents: String) -> i64 {
         let size = 10007;
         forward(&[get_transformation(&contents, size)], 2019, size)

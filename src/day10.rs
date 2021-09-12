@@ -9,10 +9,7 @@ pub struct Day10;
 
 const N: usize = 200;
 
-impl Problem<String, String, usize, i32> for Day10 {
-    fn day() -> u8 {
-        10
-    }
+impl Problem<String, String, usize, i32, 10> for Day10 {
     fn first(contents: String) -> usize {
         let asteroids = parse_asteroids(&contents);
 

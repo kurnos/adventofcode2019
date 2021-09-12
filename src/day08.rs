@@ -14,10 +14,7 @@ fn my_counts<It: Iterator<Item = char>>(iter: It) -> [u16; 3] {
 const WIDTH: usize = 25;
 const HEIGHT: usize = 6;
 
-impl Problem<String, String, u16, String> for Day8 {
-    fn day() -> u8 {
-        8
-    }
+impl Problem<String, String, u16, String, 8> for Day8 {
     fn first(contents: String) -> u16 {
         let x = contents
             .chars()

@@ -13,10 +13,7 @@ enum S {
     Door(u32),
 }
 
-impl Problem<String, String, i32, i32> for Day18 {
-    fn day() -> u8 {
-        18
-    }
+impl Problem<String, String, i32, i32, 18> for Day18 {
     fn first(contents: String) -> i32 {
         let g = Grid::new(contents);
         let all_keys = g.keys().fold(0, |a, x| a | x.1);

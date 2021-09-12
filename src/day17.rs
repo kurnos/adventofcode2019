@@ -13,10 +13,7 @@ enum C {
     F,
 }
 
-impl Problem<String, String, i16, i64> for Day17 {
-    fn day() -> u8 {
-        17
-    }
+impl Problem<String, String, i16, i64, 17> for Day17 {
     fn first(contents: String) -> i16 {
         let (_, board_map) = get_scaffolding2(&contents);
         board_map

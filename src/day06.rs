@@ -3,10 +3,7 @@ use std::collections::HashMap;
 
 pub struct Day6;
 
-impl Problem<String, String, i32, i32> for Day6 {
-    fn day() -> u8 {
-        6
-    }
+impl Problem<String, String, i32, i32, 6> for Day6 {
     fn first(contents: String) -> i32 {
         let orbits = get_orbits(&contents);
         let mut prev = vec!["COM"];

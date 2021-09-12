@@ -6,10 +6,7 @@ use std::collections::{HashSet, VecDeque};
 
 pub struct Day24;
 
-impl Problem<String, String, u32, usize> for Day24 {
-    fn day() -> u8 {
-        24
-    }
+impl Problem<String, String, u32, usize, 24> for Day24 {
     fn first(contents: String) -> u32 {
         let mut b = parse_board(&contents);
         let mut seen = HashSet::new();

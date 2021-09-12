@@ -44,10 +44,7 @@ impl fmt::Display for Command {
     }
 }
 
-impl Problem<String, String, i64, i64> for Day21 {
-    fn day() -> u8 {
-        21
-    }
+impl Problem<String, String, i64, i64, 21> for Day21 {
     fn first(contents: String) -> i64 {
         let t = run_program(
             Computer::<i64>::from_str(&contents),

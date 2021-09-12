@@ -4,10 +4,7 @@ use regex::Regex;
 
 pub struct Day12;
 
-impl Problem<String, String, i16, usize> for Day12 {
-    fn day() -> u8 {
-        12
-    }
+impl Problem<String, String, i16, usize, 12> for Day12 {
     fn first(contents: String) -> i16 {
         let (mut xs, mut ys, mut zs) = parse_pos(&contents);
         let (mut vxs, mut vys, mut vzs) = ([0; 4], [0; 4], [0; 4]);

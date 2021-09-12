@@ -10,10 +10,7 @@ enum Seg {
 
 pub struct Day3;
 
-impl Problem<String, String, i32, i32> for Day3 {
-    fn day() -> u8 {
-        3
-    }
+impl Problem<String, String, i32, i32, 3> for Day3 {
     fn first(contents: String) -> i32 {
         let wires = contents.lines().map(|p| parse_wire(p)).collect::<Vec<_>>();
         let mut res = std::i32::MAX;

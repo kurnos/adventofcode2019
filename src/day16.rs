@@ -3,10 +3,7 @@ use std::iter::repeat;
 
 pub struct Day16;
 
-impl Problem<String, String, i32, i32> for Day16 {
-    fn day() -> u8 {
-        16
-    }
+impl Problem<String, String, i32, i32, 16> for Day16 {
     fn first(contents: String) -> i32 {
         let mut nums = parse_nums(&contents);
         for _ in 0..100 {

@@ -5,10 +5,7 @@ use rayon::prelude::*;
 
 pub struct Day7;
 
-impl Problem<String, String, i32, i32> for Day7 {
-    fn day() -> u8 {
-        7
-    }
+impl Problem<String, String, i32, i32, 7> for Day7 {
     fn first(contents: String) -> i32 {
         let mem = crate::computer::parse_memory(&contents);
         permutations(vec![0, 1, 2, 3, 4])
